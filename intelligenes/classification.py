@@ -1,23 +1,29 @@
-import argparse
-import os
-from datetime import datetime
-from pathlib import Path
-from typing import Any
-import pandas as pd
-import numpy as np
+# Data Tools
 import matplotlib.pyplot as plt
-
+import numpy as np
+import pandas as pd
 from pandas import DataFrame, Series
-from shap import KernelExplainer, TreeExplainer, LinearExplainer, sample, summary_plot
-from shap.maskers import Independent
+
+# Machine Learning
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
+
+# SHAP scores
+from shap import KernelExplainer, TreeExplainer, LinearExplainer, sample, summary_plot
+from shap.maskers import Independent
+
+# Misc
+import argparse
+from datetime import datetime
+import os
+from pathlib import Path
+from typing import Any
 
 
 def with_tuning(classifier, rand_state, nsplits: int, parameters: dict[str, Any]):
@@ -267,14 +273,22 @@ def classify_features(
         for importances in model_shaps:
             # importances has dimensionality of [samples x features]. We want [1 x features]
             # so `importances` below is a row vector of dimension `features`
-            importances = np.mean(importances, axis=0)  # 'flatten' the rows into their mean
-            normalized = importances / np.max(np.abs(importances))  # scale between -1 and 1
+            importances = np.mean(
+                importances, axis=0
+            )  # 'flatten' the rows into their mean
+            normalized = importances / np.max(
+                np.abs(importances)
+            )  # scale between -1 and 1
             normalized_features_importances.append(normalized)
             # TODO: decide if axis=0 is necessary
-            feature_hhi_weights.append(np.sum(np.square(np.abs(normalized) * 100), axis=0))
+            feature_hhi_weights.append(
+                np.sum(np.square(np.abs(normalized) * 100), axis=0)
+            )
 
         # np.sum() sums up all entries individually ([models x features] --> number) [[1, 2], [3, 4]] --> 10
-        feature_hhi_weights = np.array(feature_hhi_weights) / np.sum(feature_hhi_weights)
+        feature_hhi_weights = np.array(feature_hhi_weights) / np.sum(
+            feature_hhi_weights
+        )
         initial_weights = 1 / len(classifiers)
         final_weights = initial_weights + (initial_weights * feature_hhi_weights)
         print(final_weights)
@@ -283,12 +297,16 @@ def classify_features(
         igenes_scores = None
         for weight, importance in zip(final_weights, normalized_features_importances):
             result = weight * np.abs(importance)
-            igenes_scores = igenes_scores + result if igenes_scores is not None else result
+            igenes_scores = (
+                igenes_scores + result if igenes_scores is not None else result
+            )
 
         # of size [features x models] --> list(zip(*)) converts a list of lists to a list of tuples that is the transpose
         transposed_importances = list(zip(*normalized_features_importances))
         # sums the expression direction of a featuer per model
-        directions = [expression_direction(*scores) for scores in transposed_importances]
+        directions = [
+            expression_direction(*scores) for scores in transposed_importances
+        ]
 
         igenes_df = DataFrame(
             {
@@ -319,7 +337,6 @@ def classify_features(
             )
             plt.savefig(plot_path)
             plt.close()
-    
 
 
 if __name__ == "__main__":

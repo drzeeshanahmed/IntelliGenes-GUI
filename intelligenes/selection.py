@@ -1,14 +1,19 @@
-import argparse
-import os
-from pathlib import Path
-from datetime import datetime
+# Data Tools
 import pandas as pd
 from pandas import DataFrame, Series
+
+# Machine Learning
+from scipy.stats import pearsonr
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_selection import SelectKBest, chi2, f_classif, RFE
 from sklearn.tree import DecisionTreeClassifier
-from scipy.stats import pearsonr
+
+# Misc
+import argparse
+from datetime import datetime
+import os
+from pathlib import Path
 
 
 def recursive_elim(

@@ -1,37 +1,41 @@
-import argparse
+# Data Tools
 import pandas as pd
-import os
-from datetime import datetime
-from pathlib import Path
 
+# Intelligenes
 from selection import select_features
 from classification import classify_features
 
-if __name__ == '__main__':
+# Misc
+import argparse
+from datetime import datetime
+from pathlib import Path
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--cgit_file', required=True)
-    parser.add_argument('-o', '--output_dir', required=True)
-    
-    parser.add_argument('--random_state', type=int, default=42)
-    parser.add_argument('--test_size', type=float, default=0.3)
-    parser.add_argument('--n_splits', type=int, default=5)
-    
-    parser.add_argument('--normalize', action='store_true')
-    parser.add_argument('--no_rfe', action='store_true')
-    parser.add_argument('--no_pearson', action='store_true')
-    parser.add_argument('--no_chi2', action='store_true')
-    parser.add_argument('--no_anova', action='store_true')
-    
-    parser.add_argument('--voting', type=str, default='soft')
-    parser.add_argument('--no_rf', action='store_true')
-    parser.add_argument('--no_svm', action='store_true')
-    parser.add_argument('--no_xgb', action='store_true')
-    parser.add_argument('--no_knn', action='store_true')
-    parser.add_argument('--no_mlp', action='store_true')
-    parser.add_argument('--tune', action='store_true')
-    parser.add_argument('--no_igenes', action='store_true')
-    parser.add_argument('--no_visualizations', action='store_true')
-    
+    parser.add_argument("-i", "--cgit_file", required=True)
+    parser.add_argument("-o", "--output_dir", required=True)
+
+    parser.add_argument("--random_state", type=int, default=42)
+    parser.add_argument("--test_size", type=float, default=0.3)
+    parser.add_argument("--n_splits", type=int, default=5)
+
+    parser.add_argument("--normalize", action="store_true")
+    parser.add_argument("--no_rfe", action="store_true")
+    parser.add_argument("--no_pearson", action="store_true")
+    parser.add_argument("--no_chi2", action="store_true")
+    parser.add_argument("--no_anova", action="store_true")
+
+    parser.add_argument("--voting", type=str, default="soft")
+    parser.add_argument("--no_rf", action="store_true")
+    parser.add_argument("--no_svm", action="store_true")
+    parser.add_argument("--no_xgb", action="store_true")
+    parser.add_argument("--no_knn", action="store_true")
+    parser.add_argument("--no_mlp", action="store_true")
+    parser.add_argument("--tune", action="store_true")
+    parser.add_argument("--no_igenes", action="store_true")
+    parser.add_argument("--no_visualizations", action="store_true")
+
     args = parser.parse_args()
 
     y_label_col = "Type"
