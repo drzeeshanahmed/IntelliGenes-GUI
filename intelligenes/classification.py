@@ -19,7 +19,6 @@ from shap import KernelExplainer, TreeExplainer, LinearExplainer, sample, summar
 from shap.maskers import Independent
 
 # Misc
-import argparse
 from datetime import datetime
 import os
 from pathlib import Path
@@ -337,43 +336,36 @@ def classify_features(
             )
             plt.savefig(plot_path)
             plt.close()
+    
+    print("Finished Feature Classification")
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("-i", "--cgit_file", required=True)
-    parser.add_argument("-f", "--features_file", required=True)
-    parser.add_argument("-o", "--output_dir", required=True)
-
-    parser.add_argument("--random_state", type=int, default=42)
-    parser.add_argument("--test_size", type=float, default=0.3)
-    parser.add_argument("--n_splits", type=int, default=5)
-
-    parser.add_argument("--voting", type=str, default="soft")
-    parser.add_argument("--tune", action="store_true")
-    parser.add_argument("--normalize", action="store_true")
-    parser.add_argument("--no_igenes", action="store_true")
-    parser.add_argument("--no_visualizations", action="store_true")
-
-    parser.add_argument("--no_rf", action="store_true")
-    parser.add_argument("--no_svm", action="store_true")
-    parser.add_argument("--no_xgb", action="store_true")
-    parser.add_argument("--no_knn", action="store_true")
-    parser.add_argument("--no_mlp", action="store_true")
-
-    args = parser.parse_args()
-
+def main(
+    cgit_file: str,
+    features_file: str,
+    output_dir: str,
+    rand_state: int,
+    test_size: float,
+    n_splits: int,
+    voting_type: str,
+    use_tuning: bool,
+    use_normalization: bool,
+    use_igenes: bool,
+    use_visualizations: bool,
+    use_rf: bool,
+    use_svm: bool,
+    use_xgb: bool,
+    use_knn: bool,
+    use_mlp: bool,
+):
     # Same as what is outputed from `selection.py`
     selected_column = "Features"
     y_label_col = "Type"
 
-    print(f"Reading Data from {args.cgit_file}")
-    input_df = pd.read_csv(args.cgit_file).drop(columns=["ID"])
-    print(f"Reading Selected Features from {args.features_file}")
-    selected = (
-        pd.read_csv(args.features_file)[selected_column].values.flatten().tolist()
-    )
+    print(f"Reading Data from {cgit_file}")
+    input_df = pd.read_csv(cgit_file).drop(columns=["ID"])
+    print(f"Reading Selected Features from {features_file}")
+    selected = pd.read_csv(features_file)[selected_column].values.flatten().tolist()
 
     X = input_df[selected]
     Y = input_df[y_label_col]
@@ -381,21 +373,19 @@ if __name__ == "__main__":
     classify_features(
         X,
         Y,
-        rand_state=args.random_state,
-        test_size=args.test_size,
-        use_normalization=args.normalize,
-        use_tuning=args.tune,
-        nsplits=args.n_splits,
-        use_rf=not args.no_rf,
-        use_svm=not args.no_svm,
-        use_xgb=not args.no_xgb,
-        use_knn=not args.no_knn,
-        use_mlp=not args.no_mlp,
-        voting_type=args.voting,
-        use_visualizations=not args.no_visualizations,
-        use_igenes=not args.no_igenes,
-        output_dir=args.output_dir,
-        stem=f"{Path(args.cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
+        rand_state=rand_state,
+        test_size=test_size,
+        use_normalization=use_normalization,
+        use_tuning=use_tuning,
+        nsplits=n_splits,
+        use_rf=use_rf,
+        use_svm=use_svm,
+        use_xgb=use_xgb,
+        use_knn=use_knn,
+        use_mlp=use_mlp,
+        voting_type=voting_type,
+        use_visualizations=use_visualizations,
+        use_igenes=use_igenes,
+        output_dir=output_dir,
+        stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
     )
-
-    print("Finished Feature Classification")
