@@ -2,8 +2,8 @@
 import pandas as pd
 
 # Intelligenes
-from selection import select_features
-from classification import classify_features
+from intelligenes.selection import select_features
+from intelligenes.classification import classify_features
 
 # Misc
 from datetime import datetime

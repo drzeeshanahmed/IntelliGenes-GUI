@@ -10,7 +10,6 @@ from sklearn.feature_selection import SelectKBest, chi2, f_classif, RFE
 from sklearn.tree import DecisionTreeClassifier
 
 # Misc
-import argparse
 from datetime import datetime
 import os
 from pathlib import Path

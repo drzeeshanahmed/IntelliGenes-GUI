@@ -1,5 +1,8 @@
 # Data Tools
+import matplotlib as mlp
+mlp.use('Agg')
 import matplotlib.pyplot as plt
+
 import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
@@ -200,11 +203,12 @@ def classify_features(
     names = []
     classifiers = []
     model_shaps = []
-
+    
     if use_rf:
         names.append("Random Forest")
         rf = rf_classifier(x, y, rand_state, use_tuning, nsplits)
         classifiers.append(rf)
+        print("Calculating SHAP-scores")
         explainer = TreeExplainer(rf)
         # Random Forest, unlike the other classifiers returns a matrix of shap values for each class (0 and 1). Other classifers return only for the 1 class.
         # Since 0 and 1 are mutually exclusive, the SHAP value for getting 1 is the opposite of getting 0.
@@ -213,24 +217,28 @@ def classify_features(
         names.append("Support Vector Machine")
         svm = svm_classifier(x, y, rand_state, use_tuning, nsplits)
         classifiers.append(svm)
+        print("Calculating SHAP-scores")
         explainer = LinearExplainer(svm, masker=Independent(x))
         model_shaps.append(explainer.shap_values(x_t))
     if use_xgb:
         names.append("XGBoost")
         xgb = xgb_classifier(x, y, rand_state, use_tuning, nsplits)
         classifiers.append(xgb)
+        print("Calculating SHAP-scores")
         explainer = TreeExplainer(xgb)
         model_shaps.append(explainer.shap_values(x_t))
     if use_knn:
         names.append("K-Nearest Neighbors")
         knn = knn_classifier(x, y, rand_state, use_tuning, nsplits)
         classifiers.append(knn)
+        print("Calculating SHAP-scores")
         explainer = KernelExplainer(knn.predict, sample(x, 1000))
         model_shaps.append(explainer.shap_values(x_t))
     if use_mlp:
         names.append("Multi-Layer Perceptron")
         mlp = mlp_classifier(x, y, rand_state, use_tuning, nsplits)
         classifiers.append(mlp)
+        print("Calculating SHAP-scores")
         explainer = KernelExplainer(mlp.predict, sample(x, 1000))
         model_shaps.append(explainer.shap_values(x_t))
 
@@ -290,7 +298,6 @@ def classify_features(
         )
         initial_weights = 1 / len(classifiers)
         final_weights = initial_weights + (initial_weights * feature_hhi_weights)
-        print(final_weights)
 
         # Should become a list of dimension features
         igenes_scores = None
@@ -326,16 +333,20 @@ def classify_features(
         print("Generating visualizations")
         for name, importances in zip(names, model_shaps):
             print(f"Generating summary_plot for {name}")
+
             summary_plot(importances, x_t, plot_type="dot", show=False)
             plt.title(f"{name} Feature Importances", fontsize=16)
             plt.xlabel("SHAP Value", fontsize=14)
             plt.ylabel("Feature", fontsize=14)
             plt.tight_layout()
+
             plot_path = os.path.join(
                 output_dir, f"{stem}_{name.replace(' ', '-')}-SHAP.png"
             )
             plt.savefig(plot_path)
+            plt.clf()
             plt.close()
+
     
     print("Finished Feature Classification")
 
