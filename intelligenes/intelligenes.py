@@ -1,4 +1,5 @@
 # Data Tools
+import argparse
 import pandas as pd
 
 # Intelligenes
@@ -30,7 +31,7 @@ def main(
     use_xgb: bool,
     use_knn: bool,
     use_mlp: bool,
-):
+):  
     y_label_col = "Type"
     output_features_col = "Features"
 

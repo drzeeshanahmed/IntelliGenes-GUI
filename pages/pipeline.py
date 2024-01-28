@@ -3,9 +3,9 @@ from typing import Callable
 
 from components.controls import PipelineControls
 from components.console import PipelineConsole
-from utils.output_capture import CaptureOutput, Worker
+from utils.output_capture import CaptureOutput
 
-from utils.pipeline import (
+from utils.intelligenes_pipelines import (
     classification_pipeline,
     feature_selection_pipeline,
     select_and_classify_pipeline,
@@ -40,25 +40,14 @@ class PipelinePage(QWidget):
         def run():
             # need to declare global so that variables doesn't immediately go out of scope
             global job, output
-
-            job = Worker(pipelines[combo_box.currentIndex()][2])
-            output = CaptureOutput()
-
-            job.started.connect(lambda: run_button.setDisabled(True))
-            job.finished.connect(lambda: run_button.setDisabled(False))
-            job.finished.connect(output.close)
-
+            output = CaptureOutput(pipelines[combo_box.currentIndex()][2])
             output.textChanged.connect(console.setText)
-
-            job.finished.connect(job.deleteLater)
-            output.finished.connect(output.deleteLater)
-
-            # Start job only after output capture is ready
-            output.started.connect(job.start)
+            output.started.connect(lambda: run_button.setDisabled(True))
+            output.finished.connect(lambda: run_button.setDisabled(False))
             output.start()
-
+        
         run_button.clicked.connect(run)
-        combo_box.currentIndexChanged.connect(console.clear)
+        # combo_box.currentIndexChanged.connect(console.clear)
 
         controls = PipelineControls(pipelines, run_button, combo_box)
 

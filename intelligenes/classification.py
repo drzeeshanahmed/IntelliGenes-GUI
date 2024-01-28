@@ -1,6 +1,7 @@
 # Data Tools
 import matplotlib as mlp
-mlp.use('Agg')
+
+mlp.use("Agg")
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -203,7 +204,7 @@ def classify_features(
     names = []
     classifiers = []
     model_shaps = []
-    
+
     if use_rf:
         names.append("Random Forest")
         rf = rf_classifier(x, y, rand_state, use_tuning, nsplits)
@@ -331,9 +332,10 @@ def classify_features(
 
     if use_visualizations:
         print("Generating visualizations")
+
         for name, importances in zip(names, model_shaps):
             print(f"Generating summary_plot for {name}")
-
+            
             summary_plot(importances, x_t, plot_type="dot", show=False)
             plt.title(f"{name} Feature Importances", fontsize=16)
             plt.xlabel("SHAP Value", fontsize=14)
@@ -347,7 +349,6 @@ def classify_features(
             plt.clf()
             plt.close()
 
-    
     print("Finished Feature Classification")
 
 
