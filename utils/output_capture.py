@@ -8,11 +8,13 @@ from threading import Thread
 from PySide6.QtCore import Signal, QThread
 from typing import Callable
 
-class Worker:
+from utils.queue import StdOut
 
-    def __init__(self, process: Callable[[], None]):
+class Worker:
+    def __init__(self, process: Callable[[], None], queue: StdOut):
         super().__init__()
         self._process = process
+        self._queue = queue
     
     def start(self):
         # Memory Issue while using QThread for process, seems to work with normal Thread API
@@ -21,6 +23,7 @@ class Worker:
     
     def run(self):
         self._process()
+        self._queue.close()
     
     def is_alive(self):
         return self._thread is not None and self._thread.is_alive()
@@ -28,60 +31,27 @@ class Worker:
 
 class CaptureOutput(QThread):
     textChanged = Signal(str)
-    beganRunning = Signal()
 
-    def __init__(self, job):
+    def __init__(self, job, stdout: StdOut):
         super().__init__()
-        self._stdout = None
-        self._stdout = None
-        self._ostream = None
-        self._istream = None
-        self._job = Worker(job)
+        self._stdout = stdout
+        self._job = Worker(job, stdout)
         self._text = ""
-    
-    def print(self, s, end=""):
-        print(s, file=self._stdout, end=end)
-    
-    def readAndAppendLine(self):
-        try:
-            line = self._istream.readline()
-            if len(line) > 0:
-                self._text += line
-                return True
-        except:
-            pass
-        
-        return False
-    
+
     def run(self):
-        self._stdout = sys.stdout
-        self._stderr = sys.stderr
-        # creates a pair where output to w gets read from r
-        r, w = os.pipe()
-        self._istream, self._ostream = os.fdopen(r, "r"), os.fdopen(w, "w", 1)
-        sys.stdout = self._ostream
-        sys.stderr = self._ostream
-
         self._job.start()
-        while self._job.is_alive():
-            if self.readAndAppendLine():
+
+        while self._job.is_alive() or not self._stdout.empty():
+            line = self._stdout.read()
+            if line is not None:
+                self._text += line
                 self.textChanged.emit(self._text)
-
-        # Finish reading any remaining lines
-        # while True:
-        #     print("still reading")
-        #     if self.readAndAppendLine():
-        #         print("read line")
-        #         self.textChanged.emit(self._text)
-        #         print("next")
-        #     else:
-        #         break
-
-        # Cleanup memory
-        self.deleteLater()
-        self._ostream.close()
-        self._istream.close()
-        sys.stdout = self._stdout
-        sys.stderr = self._stderr
         
+        self.close()
+
+    # Cleanup memory
+    def close(self):
+        self._stdout.close()
+        self.quit()
+        self.deleteLater()
         

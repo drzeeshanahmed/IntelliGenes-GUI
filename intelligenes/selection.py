@@ -14,11 +14,12 @@ from datetime import datetime
 import os
 from pathlib import Path
 
+from utils.queue import StdOut
+
 
 def recursive_elim(
     x: DataFrame, y: Series, rand_state: int, features_col: str, ranking_col: str
 ) -> DataFrame:
-    print("Recursive Feature Elimination")
     e = DecisionTreeClassifier(random_state=rand_state)
     rfe = RFE(estimator=e, n_features_to_select=1).fit(x, y)
 
@@ -35,7 +36,6 @@ def recursive_elim(
 
 
 def pearson(x: DataFrame, y: Series, features_col: str, p_value_col: str) -> DataFrame:
-    print("Pearson Correlation")
     df = pd.DataFrame(
         {
             "features": x.columns,
@@ -51,7 +51,6 @@ def pearson(x: DataFrame, y: Series, features_col: str, p_value_col: str) -> Dat
 def chi2_test(
     x: DataFrame, y: Series, features_col: str, p_value_col: str
 ) -> DataFrame:
-    print("Chi-Squared Test")
     chi = SelectKBest(score_func=chi2, k="all").fit(x, y)
     df = pd.DataFrame(
         {
@@ -64,7 +63,6 @@ def chi2_test(
 
 
 def anova(x: DataFrame, y: Series, features_col: str, p_value_col: str) -> DataFrame:
-    print("Analysis of Variance")
     anova = SelectKBest(score_func=f_classif, k="all").fit(x, y)
     df = pd.DataFrame(
         {
@@ -77,7 +75,6 @@ def anova(x: DataFrame, y: Series, features_col: str, p_value_col: str) -> DataF
 
 
 def min_max_scalar(x: DataFrame) -> DataFrame:
-    print("Normalizing DataFrame")
     return pd.DataFrame(MinMaxScaler().fit_transform(x), columns=x.columns)
 
 
@@ -85,6 +82,7 @@ def min_max_scalar(x: DataFrame) -> DataFrame:
 def select_features(
     X: DataFrame,
     Y: Series,
+    stdout: StdOut,
     features_col: str,
     test_size: int,
     rand_state: int,
@@ -96,7 +94,7 @@ def select_features(
     output_dir: str,
     stem: str,
 ):
-    print("Selecting Important Features")
+    stdout.write("Selecting Important Features")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -108,16 +106,21 @@ def select_features(
     pearson_col = "Pearson's Correlation (p-value)"
 
     if use_normalization:
+        stdout.write("Normalizing DataFrame")
         x = min_max_scalar(x)
 
     results: list[DataFrame] = []
     if use_rfe:
+        stdout.write("Recursive Feature Elimination")
         results.append(recursive_elim(x, y, rand_state, features_col, rfe_col))
     if use_anova:
+        stdout.write("Analysis of Variance")
         results.append(anova(x, y, features_col, anova_col))
     if use_chi2:
+        stdout.write("Chi-Squared Test")
         results.append(chi2_test(x, y, features_col, chi2_col))
     if use_pearson:
+        stdout.write("Pearson Correlation")
         results.append(pearson(x, y, features_col, pearson_col))
 
     all = None
@@ -136,14 +139,15 @@ def select_features(
 
     all.to_csv(all_path, index=False)
     selected.to_csv(selected_path, index=False)
-    print(f"Saved all feature rankings to {all_path}")
-    print(f"Saved selected feature rankings to {selected_path}")
-    print("Finished Feature Selection")
+    stdout.write(f"Saved all feature rankings to {all_path}")
+    stdout.write(f"Saved selected feature rankings to {selected_path}")
+    stdout.write("Finished Feature Selection")
 
     return selected[features_col]
 
 
 def main(
+    stdout: StdOut,
     cgit_file: str,
     output_dir: str,
     rand_state: int,
@@ -157,7 +161,7 @@ def main(
     y_label_col = "Type"
     output_features_col = "Features"
 
-    print(f"Reading DataFrame from {cgit_file}")
+    stdout.write(f"Reading DataFrame from {cgit_file}")
 
     input_df = pd.read_csv(cgit_file).drop(columns=["ID"])
     X = input_df.drop(columns=[y_label_col])
@@ -166,6 +170,7 @@ def main(
     select_features(
         X,
         Y,
+        stdout=stdout,
         features_col=output_features_col,
         rand_state=rand_state,
         test_size=test_size,

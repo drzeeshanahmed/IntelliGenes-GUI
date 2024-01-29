@@ -45,7 +45,8 @@ class FilesPage(QWidget):
 
     def browseDirectory(self):
         dir = QFileDialog.getExistingDirectory()
-        self.selectedDir.emit(dir)
+        if dir:
+            self.selectedDir.emit(dir)
 
     def updateDirectoryWidgets(self, path):
         self.list.clear()

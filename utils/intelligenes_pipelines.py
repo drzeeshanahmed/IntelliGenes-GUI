@@ -4,10 +4,12 @@ from utils import setting
 from PySide6.QtCore import SignalInstance
 
 from intelligenes import selection, classification, intelligenes
+from utils.queue import StdOut
 
 
 def feature_selection_pipeline(
     changeDirSignal: SignalInstance,
+    stdout: StdOut
 ) -> list[tuple[str, list[setting.Setting], Callable[[], None]]]:
     inputs: list[setting.Setting] = [
         setting.CSVSetting("CIGT File", None),
@@ -24,6 +26,7 @@ def feature_selection_pipeline(
     def run():
         if inputs[0].value is not None and inputs[1].value is not None:
             selection.main(
+                stdout=stdout,
                 cgit_file=inputs[0].value,
                 output_dir=inputs[1].value,
                 rand_state=inputs[2].value,
@@ -41,6 +44,7 @@ def feature_selection_pipeline(
 
 def classification_pipeline(
     changeDirSignal: SignalInstance,
+    stdout: StdOut
 ) -> list[tuple[str, list[setting.Setting], Callable[[], None]]]:
     inputs: list[setting.Setting] = [
         setting.CSVSetting("CIGT File", None),
@@ -68,6 +72,7 @@ def classification_pipeline(
             and inputs[2] is not None
         ):
             classification.main(
+                stdout=stdout,
                 cgit_file=inputs[0].value,
                 features_file=inputs[1].value,
                 output_dir=inputs[2].value,
@@ -93,6 +98,7 @@ def classification_pipeline(
 
 def select_and_classify_pipeline(
     changeDirSignal: SignalInstance,
+    stdout: StdOut
 ) -> list[tuple[str, list[setting.Setting], Callable[[], None]]]:
     inputs: list[setting.Setting] = [
         setting.CSVSetting("CIGT File", None),
@@ -119,6 +125,7 @@ def select_and_classify_pipeline(
     def run():
         if inputs[0].value is not None and inputs[1].value is not None:
             intelligenes.main(
+                stdout=stdout,
                 cgit_file=inputs[0].value,
                 output_dir=inputs[1].value,
                 rand_state=inputs[2].value,

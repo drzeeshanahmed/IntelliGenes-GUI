@@ -1,6 +1,8 @@
 # Data Tools
 import matplotlib as mlp
 
+from utils.queue import StdOut
+
 mlp.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -30,7 +32,6 @@ from typing import Any
 
 
 def with_tuning(classifier, rand_state, nsplits: int, parameters: dict[str, Any]):
-    print("Tuning Hyperparameters")
     return GridSearchCV(
         classifier,
         param_grid=parameters,
@@ -41,10 +42,13 @@ def with_tuning(classifier, rand_state, nsplits: int, parameters: dict[str, Any]
     )
 
 
-def rf_classifier(x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int):
-    print("Random Forest")
+def rf_classifier(
+    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int, stdout: StdOut
+):
+    stdout.write("Random Forest")
     clf = RandomForestClassifier(random_state=rand_state)
     if tuning:
+        stdout.write("Tuning Hyperparameters")
         clf = with_tuning(
             classifier=clf,
             rand_state=rand_state,
@@ -59,11 +63,12 @@ def rf_classifier(x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplit
 
 
 def svm_classifier(
-    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int
+    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int, stdout: StdOut
 ):
-    print("Support Vector Machine")
+    stdout.write("Support Vector Machine")
     clf = SVC(random_state=rand_state, kernel="linear", probability=True)
     if tuning:
+        stdout.write("Tuning Hyperparameters")
         clf = with_tuning(
             classifier=clf,
             rand_state=rand_state,
@@ -78,11 +83,12 @@ def svm_classifier(
 
 
 def xgb_classifier(
-    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int
+    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int, stdout: StdOut
 ):
-    print("XGBoost")
+    stdout.write("XGBoost")
     clf = XGBClassifier(random_state=rand_state, objective="binary:logistic")
     if tuning:
+        stdout.write("Tuning Hyperparameters")
         clf = with_tuning(
             classifier=clf,
             rand_state=rand_state,
@@ -98,11 +104,12 @@ def xgb_classifier(
 
 
 def knn_classifier(
-    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int
+    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int, stdout: StdOut
 ):
-    print("K-Nearest Neighbors")
+    stdout.write("K-Nearest Neighbors")
     clf = KNeighborsClassifier()
     if tuning:
+        stdout.write("Tuning Hyperparameters")
         clf = with_tuning(
             classifier=clf,
             rand_state=rand_state,
@@ -117,11 +124,12 @@ def knn_classifier(
 
 
 def mlp_classifier(
-    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int
+    x: DataFrame, y: Series, rand_state: int, tuning: bool, nsplits: int, stdout: StdOut
 ):
-    print("Multi-Layer Perceptron")
+    stdout.write("Multi-Layer Perceptron")
     clf = MLPClassifier(random_state=rand_state, max_iter=2000)
     if tuning:
+        stdout.write("Tuning Hyperparameters")
         clf = with_tuning(
             classifier=clf,
             rand_state=rand_state,
@@ -146,16 +154,15 @@ def mlp_classifier(
 
 
 def voting_classifier(
-    x: DataFrame, y: DataFrame, voting: str, names: list[str], classifiers: list[Any]
+    x: DataFrame, y: DataFrame, voting: str, names: list[str], classifiers: list[Any], stdout: StdOut
 ):
-    print("Voting Classifier")
+    stdout.write("Voting Classifier")
     return VotingClassifier(
         estimators=list(zip(names, classifiers)), voting=voting
     ).fit(x, y)
 
 
 def standard_scalar(x: DataFrame) -> DataFrame:
-    print("Normalizing DataFrame")
     return pd.DataFrame(StandardScaler().fit_transform(x), columns=x.columns)
 
 
@@ -174,6 +181,7 @@ def expression_direction(*scores: list[float]):
 def classify_features(
     X: DataFrame,
     Y: Series,
+    stdout: StdOut,
     rand_state: int,
     test_size: float,
     use_normalization: bool,
@@ -190,7 +198,7 @@ def classify_features(
     output_dir: str,
     stem: str,
 ):
-    print("Feature Classification")
+    stdout.write("Feature Classification")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -199,6 +207,7 @@ def classify_features(
     )
 
     if use_normalization:
+        stdout.write("Normalizing DataFrame")
         x = standard_scalar(x)
 
     names = []
@@ -207,51 +216,51 @@ def classify_features(
 
     if use_rf:
         names.append("Random Forest")
-        rf = rf_classifier(x, y, rand_state, use_tuning, nsplits)
+        rf = rf_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(rf)
-        print("Calculating SHAP-scores")
+        stdout.write("Calculating SHAP-scores")
         explainer = TreeExplainer(rf)
         # Random Forest, unlike the other classifiers returns a matrix of shap values for each class (0 and 1). Other classifers return only for the 1 class.
         # Since 0 and 1 are mutually exclusive, the SHAP value for getting 1 is the opposite of getting 0.
         model_shaps.append(explainer.shap_values(x_t)[1])
     if use_svm:
         names.append("Support Vector Machine")
-        svm = svm_classifier(x, y, rand_state, use_tuning, nsplits)
+        svm = svm_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(svm)
-        print("Calculating SHAP-scores")
+        stdout.write("Calculating SHAP-scores")
         explainer = LinearExplainer(svm, masker=Independent(x))
         model_shaps.append(explainer.shap_values(x_t))
     if use_xgb:
         names.append("XGBoost")
-        xgb = xgb_classifier(x, y, rand_state, use_tuning, nsplits)
+        xgb = xgb_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(xgb)
-        print("Calculating SHAP-scores")
+        stdout.write("Calculating SHAP-scores")
         explainer = TreeExplainer(xgb)
         model_shaps.append(explainer.shap_values(x_t))
     if use_knn:
         names.append("K-Nearest Neighbors")
-        knn = knn_classifier(x, y, rand_state, use_tuning, nsplits)
+        knn = knn_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(knn)
-        print("Calculating SHAP-scores")
+        stdout.write("Calculating SHAP-scores")
         explainer = KernelExplainer(knn.predict, sample(x, 1000))
         model_shaps.append(explainer.shap_values(x_t))
     if use_mlp:
         names.append("Multi-Layer Perceptron")
-        mlp = mlp_classifier(x, y, rand_state, use_tuning, nsplits)
+        mlp = mlp_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(mlp)
-        print("Calculating SHAP-scores")
+        stdout.write("Calculating SHAP-scores")
         explainer = KernelExplainer(mlp.predict, sample(x, 1000))
         model_shaps.append(explainer.shap_values(x_t))
 
     if not classifiers:
-        print("No classifiers were executed. Exiting...")
+        stdout.write("No classifiers were executed. Exiting...")
         return
 
     names.append("Voting Classifier")
-    voting = voting_classifier(x, y, voting_type, names, classifiers)
+    voting = voting_classifier(x, y, voting_type, names, classifiers, stdout=stdout)
     classifiers.append(voting)
 
-    print("Calculating Metrics")
+    stdout.write("Calculating Metrics")
     metrics = None
     for name, classifier in zip(names, classifiers):
         y_pred = classifier.predict(x_t)
@@ -271,10 +280,10 @@ def classify_features(
 
     metrics_path = os.path.join(output_dir, f"{stem}_Classifier-Metrics.csv")
     metrics.to_csv(metrics_path, index=False)
-    print(f"Saved classifier metrics to {metrics_path}")
+    stdout.write(f"Saved classifier metrics to {metrics_path}")
 
     if use_igenes:
-        print("Calculating I-Genes score")
+        stdout.write("Calculating I-Genes score")
         feature_hhi_weights = []  # weights of each feature *per model*
         normalized_features_importances = []  # importances for each feature *per model*
 
@@ -328,14 +337,14 @@ def classify_features(
 
         igenes_path = os.path.join(output_dir, f"{stem}_I-Genes-Score.csv")
         igenes_df.to_csv(igenes_path, index=False)
-        print(f"Saved igenes scores to {igenes_path}")
+        stdout.write(f"Saved igenes scores to {igenes_path}")
 
     if use_visualizations:
-        print("Generating visualizations")
+        stdout.write("Generating visualizations")
 
         for name, importances in zip(names, model_shaps):
-            print(f"Generating summary_plot for {name}")
-            
+            stdout.write(f"Generating summary_plot for {name}")
+
             summary_plot(importances, x_t, plot_type="dot", show=False)
             plt.title(f"{name} Feature Importances", fontsize=16)
             plt.xlabel("SHAP Value", fontsize=14)
@@ -349,10 +358,11 @@ def classify_features(
             plt.clf()
             plt.close()
 
-    print("Finished Feature Classification")
+    stdout.write("Finished Feature Classification")
 
 
 def main(
+    stdout: StdOut,
     cgit_file: str,
     features_file: str,
     output_dir: str,
@@ -374,9 +384,9 @@ def main(
     selected_column = "Features"
     y_label_col = "Type"
 
-    print(f"Reading Data from {cgit_file}")
+    stdout.write(f"Reading Data from {cgit_file}")
     input_df = pd.read_csv(cgit_file).drop(columns=["ID"])
-    print(f"Reading Selected Features from {features_file}")
+    stdout.write(f"Reading Selected Features from {features_file}")
     selected = pd.read_csv(features_file)[selected_column].values.flatten().tolist()
 
     X = input_df[selected]
@@ -400,4 +410,5 @@ def main(
         use_igenes=use_igenes,
         output_dir=output_dir,
         stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
+        stdout=stdout,
     )

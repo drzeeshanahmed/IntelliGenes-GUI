@@ -1,5 +1,4 @@
 # Data Tools
-import argparse
 import pandas as pd
 
 # Intelligenes
@@ -9,6 +8,8 @@ from intelligenes.classification import classify_features
 # Misc
 from datetime import datetime
 from pathlib import Path
+
+from utils.queue import StdOut
 
 
 def main(
@@ -31,11 +32,12 @@ def main(
     use_xgb: bool,
     use_knn: bool,
     use_mlp: bool,
+    stdout: StdOut,
 ):  
     y_label_col = "Type"
     output_features_col = "Features"
 
-    print(f"Reading DataFrame from {cgit_file}")
+    stdout.write(f"Reading DataFrame from {cgit_file}")
 
     input_df = pd.read_csv(cgit_file).drop(columns=["ID"])
     X = input_df.drop(columns=[y_label_col])
@@ -54,6 +56,7 @@ def main(
         use_chi2=use_chi2,
         output_dir=output_dir,
         stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
+        stdout=stdout,
     )
 
     X = input_df[selected]
@@ -77,6 +80,7 @@ def main(
         use_igenes=use_igenes,
         output_dir=output_dir,
         stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
+        stdout=stdout
     )
 
-    print("Finished Intelligenes Pipeline")
+    stdout.write("Finished Intelligenes Pipeline")
