@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QComboBox
+from PySide6.QtCore import SignalInstance
 from typing import Callable
 
-from components.controls import PipelineControls
-from components.console import PipelineConsole
+from ui.pipeline.controls import PipelineControls
+from ui.pipeline.console import PipelineConsole
 from utils.output_capture import CaptureOutput
 
 from utils.intelligenes_pipelines import (
@@ -16,12 +17,12 @@ job = None
 output = None
 
 class PipelinePage(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, changeDirSignal: SignalInstance) -> None:
         super().__init__()
         pipelines: list[tuple[str, list[Setting], Callable[[], None]]] = [
-            feature_selection_pipeline(),
-            classification_pipeline(),
-            select_and_classify_pipeline(),
+            feature_selection_pipeline(changeDirSignal),
+            classification_pipeline(changeDirSignal),
+            select_and_classify_pipeline(changeDirSignal),
         ]
 
         layout = QHBoxLayout()
@@ -52,4 +53,7 @@ class PipelinePage(QWidget):
         controls = PipelineControls(pipelines, run_button, combo_box)
 
         layout.addWidget(controls)
+        layout.setStretch(0, 1)
         layout.addWidget(console)
+        layout.setStretch(1, 2)
+

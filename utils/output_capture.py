@@ -3,7 +3,6 @@ import io
 import os
 import sys
 from threading import Thread
-from time import sleep
 
 # from threading import Thread
 from PySide6.QtCore import Signal, QThread
