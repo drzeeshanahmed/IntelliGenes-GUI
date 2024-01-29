@@ -5,7 +5,7 @@ from typing import Callable
 
 from ui.pipeline.controls import PipelineControls
 from ui.pipeline.console import PipelineConsole
-from utils.output_capture import CaptureOutput
+from utils.output_capture import CaptureOutput, Worker
 from utils.queue import StdOut
 
 from utils.intelligenes_pipelines import (
@@ -15,19 +15,17 @@ from utils.intelligenes_pipelines import (
 )
 from utils.setting import Setting
 
-job = None
-output = None
-
 class PipelinePage(QWidget):
     def __init__(self, changeDirSignal: SignalInstance) -> None:
         super().__init__()
-        
-        self._stdout = StdOut()
+
+        self.stdout = StdOut()
+        self.output = CaptureOutput(self.stdout)
 
         pipelines: list[tuple[str, list[Setting], Callable[[], None]]] = [
-            feature_selection_pipeline(changeDirSignal, self._stdout),
-            classification_pipeline(changeDirSignal, self._stdout),
-            select_and_classify_pipeline(changeDirSignal, self._stdout),
+            feature_selection_pipeline(changeDirSignal, self.stdout),
+            classification_pipeline(changeDirSignal, self.stdout),
+            select_and_classify_pipeline(changeDirSignal, self.stdout),
         ]
 
         layout = QHBoxLayout()
@@ -42,16 +40,15 @@ class PipelinePage(QWidget):
 
         console = PipelineConsole()
         
+        self.output.textChanged.connect(console.setText)
+        self.output.started.connect(lambda: run_button.setDisabled(True))
+        self.output.finished.connect(lambda: run_button.setDisabled(False))
+
         # Run process in a separate thread and capture output for the console
         def run():
-            # need to declare global so that variables don't immediately go out of scope
-            global job, output
-            
-            output = CaptureOutput(pipelines[combo_box.currentIndex()][2], self._stdout)
-            output.textChanged.connect(console.setText)
-            output.started.connect(lambda: run_button.setDisabled(True))
-            output.finished.connect(lambda: run_button.setDisabled(False))
-            output.start()
+            self.stdout.open()
+            self.output.load_job(pipelines[combo_box.currentIndex()][2])
+            self.output.start() # closes stdout when finished (need to reopen)
         
         run_button.clicked.connect(run)
         # combo_box.currentIndexChanged.connect(console.clear)
