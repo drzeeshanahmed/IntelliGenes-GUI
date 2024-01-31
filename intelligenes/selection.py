@@ -109,30 +109,36 @@ def select_features(
         stdout.write("Normalizing DataFrame")
         x = min_max_scalar(x)
 
-    results: list[DataFrame] = []
+    results: tuple[list[DataFrame], list[Series]] = []
+    
     if use_rfe:
         stdout.write("Recursive Feature Elimination")
-        results.append(recursive_elim(x, y, rand_state, features_col, rfe_col))
+        result = recursive_elim(x, y, rand_state, features_col, rfe_col)
+        results.append((result, result[rfe_col] <= int(len(x.columns) * 0.1)))
     if use_anova:
         stdout.write("Analysis of Variance")
-        results.append(anova(x, y, features_col, anova_col))
+        result = anova(x, y, features_col, anova_col)
+        results.append((result, result[anova_col] < 0.05))
     if use_chi2:
         stdout.write("Chi-Squared Test")
-        results.append(chi2_test(x, y, features_col, chi2_col))
+        result = chi2_test(x, y, features_col, chi2_col)
+        results.append((result, result[chi2_col] < 0.05))
     if use_pearson:
         stdout.write("Pearson Correlation")
-        results.append(pearson(x, y, features_col, pearson_col))
+        result = pearson(x, y, features_col, pearson_col)
+        results.append((result, result[pearson_col] < 0.05))
 
+    if len(results) == 0:
+        stdout.write("No selectors were used. Exiting...")
+        return
+    
     all = None
-    for result in results:
+    selected_mask = None
+    for result, mask in results:
         all = result if all is None else all.merge(result, on=features_col)
-
-    selected = all.loc[
-        (all[rfe_col] <= int(all.shape[0] * 0.1))
-        & (all[pearson_col] < 0.05)
-        & (all[chi2_col] < 0.05)
-        & (all[anova_col] < 0.05)
-    ]
+        selected_mask = mask if selected_mask is None else selected_mask & mask
+    
+    selected = all.loc[selected_mask]
 
     all_path = os.path.join(output_dir, f"{stem}_All-Features.csv")
     selected_path = os.path.join(output_dir, f"{stem}_Selected-Features.csv")

@@ -1,10 +1,10 @@
 # Data Tools
 import matplotlib as mlp
-
-from utils.queue import StdOut
-
+# Non-interactive backend so that file saving doesn't consume too much memory (no need for mlp GUI)
 mlp.use("Agg")
 import matplotlib.pyplot as plt
+
+from utils.queue import StdOut
 
 import numpy as np
 import pandas as pd

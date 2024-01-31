@@ -8,9 +8,10 @@ from typing import Callable
 from utils.queue import StdOut
 
 class Worker:
-    def __init__(self, callback):
+    def __init__(self, stdout: StdOut, callback):
         super().__init__()
         self._process = None
+        self._stdout = stdout
         self._callback = callback
         self._thread = None
     
@@ -28,11 +29,19 @@ class Worker:
         self._process = process
 
     def run(self):
-        if self._process:
-            self._process()
+        try:
+            if self._process:
+                self._process()
+        except Exception as e:
+            self._stdout.write(f"Execution of pipeline failed with message: {e}")
+            self._stdout.write("Exiting...")
+            pass
+        try:
             if self._callback:
                 self._callback()
-    
+        except:
+            pass
+        
     def is_alive(self):
         return self._thread is not None and self._thread.is_alive()
 
@@ -44,7 +53,7 @@ class CaptureOutput(QThread):
         super().__init__()
         self._stdout = stdout
         # NOTE: very important to close the file descriptors to avoid memory leaks
-        self._job = Worker(stdout.close)
+        self._job = Worker(stdout, stdout.close)
         self._text = ""
     
     def load_job(self, job):
