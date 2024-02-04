@@ -20,7 +20,7 @@ from sklearn.svm import SVC
 from xgboost import XGBClassifier
 
 # SHAP scores
-from shap import KernelExplainer, TreeExplainer, LinearExplainer, sample, summary_plot
+from shap import summary_plot, Explainer
 from shap.maskers import Independent
 
 # Misc
@@ -229,54 +229,56 @@ def classify_features(
     names = []
     classifiers = []
     model_shaps = []
+    explainers = []
 
+    # Kernel Explainer caused a strange bug with PyInstaller. Namely, it caused a residual
+    # window to popup after calling shap_values(). Letting the shap library decide which
+    # window to use (e.g ExactExplainer) is better.
     if use_rf:
         names.append("Random Forest")
         rf = rf_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(rf)
-        stdout.write("Calculating SHAP-scores")
-        explainer = TreeExplainer(rf)
-        # Random Forest, unlike the other classifiers returns a matrix of shap values for each class (0 and 1). Other classifers return only for the 1 class.
-        # Since 0 and 1 are mutually exclusive, the SHAP value for getting 1 is the opposite of getting 0.
-        model_shaps.append(explainer.shap_values(x_t)[1])
+        explainers.append(Explainer(rf))
     if use_svm:
         names.append("Support Vector Machine")
         svm = svm_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(svm)
-        stdout.write("Calculating SHAP-scores")
-        explainer = LinearExplainer(svm, masker=Independent(x))
-        model_shaps.append(explainer.shap_values(x_t))
+        explainers.append(Explainer(svm, masker=Independent(x_t)))
     if use_xgb:
         names.append("XGBoost")
         xgb = xgb_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(xgb)
-        stdout.write("Calculating SHAP-scores")
-        explainer = TreeExplainer(xgb)
-        model_shaps.append(explainer.shap_values(x_t))
+        explainers.append(Explainer(xgb))
     if use_knn:
         names.append("K-Nearest Neighbors")
         knn = knn_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(knn)
-        stdout.write("Calculating SHAP-scores")
-        explainer = KernelExplainer(knn.predict, sample(x, 1000))
-        model_shaps.append(explainer.shap_values(x_t))
+        explainers.append(Explainer(knn.predict, x_t))
     if use_mlp:
         names.append("Multi-Layer Perceptron")
         mlp = mlp_classifier(x, y, rand_state, use_tuning, nsplits, stdout=stdout)
         classifiers.append(mlp)
-        stdout.write("Calculating SHAP-scores")
-        explainer = KernelExplainer(mlp.predict, sample(x, 1000))
-        model_shaps.append(explainer.shap_values(x_t))
+        explainers.append(Explainer(mlp.predict, x_t))
 
     if not classifiers:
         stdout.write("No classifiers were executed. Exiting...")
         return
 
+    for name, explainer in zip(names, explainers):
+        stdout.write(f"SHAP-scores for {name} with {explainer.__class__.__name__}")
+        shaps = explainer(x_t).values
+        # Random Forest, unlike the other classifiers returns a matrix of shap values for each class (0 and 1). Other
+        # classifers return only for the 1 class. Therefore, shape should be [samples x features], but for Random Forest,
+        # it happens to be [samples x features x labels]. This code selects the appropriate label (for case = 1)
+        if len(shaps.shape) == 3:
+            shaps = shaps[:, :, 1]
+        model_shaps.append(shaps)
+
     names.append("Voting Classifier")
     voting = voting_classifier(x, y, voting_type, names, classifiers, stdout=stdout)
     classifiers.append(voting)
 
-    stdout.write("Calculating Metrics")
+    stdout.write("Calculating metrics: Accuracy, ROC-AUC, and F1 scores")
     metrics = None
     for name, classifier in zip(names, classifiers):
         y_pred = classifier.predict(x_t)
@@ -303,25 +305,23 @@ def classify_features(
         feature_hhi_weights = []  # weights of each feature *per model*
         normalized_features_importances = []  # importances for each feature *per model*
 
-        for importances in model_shaps:
+        for name, importances in zip(names, model_shaps):
+            stdout.write(f"Calculating Herfindahl-Hirschman Indexes for {name}")
             # importances has dimensionality of [samples x features]. We want [1 x features]
             # so `importances` below is a row vector of dimension `features`
             importances = np.mean(
                 importances, axis=0
             )  # 'flatten' the rows into their mean
-            normalized = importances / np.max(
-                np.abs(importances)
-            )  # scale between -1 and 1
+            max = np.max(np.abs(importances))
+            # skip normalization if all 0s
+            normalized = importances / max if max != 0 else importances
             normalized_features_importances.append(normalized)
             # TODO: decide if axis=0 is necessary
-            feature_hhi_weights.append(
-                np.sum(np.square(np.abs(normalized) * 100), axis=0)
-            )
+            feature_hhi_weights.append(np.sum(np.square(normalized), axis=0))
 
         # np.sum() sums up all entries individually ([models x features] --> number) [[1, 2], [3, 4]] --> 10
-        feature_hhi_weights = np.array(feature_hhi_weights) / np.sum(
-            feature_hhi_weights
-        )
+        sum = np.sum(feature_hhi_weights)
+        feature_hhi_weights = np.array(feature_hhi_weights) / (1 if sum == 0 else sum)
         initial_weights = 1 / len(classifiers)
         final_weights = initial_weights + (initial_weights * feature_hhi_weights)
 

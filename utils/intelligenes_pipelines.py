@@ -91,7 +91,7 @@ def classification_pipeline(
                 use_mlp=inputs[15].value,
             )
 
-            changeDirSignal.emit(inputs[1].value)
+            changeDirSignal.emit(inputs[2].value)
 
     return ("Feature Classification", inputs, run)
 
