@@ -1,10 +1,10 @@
 from typing import Callable
-from utils import setting
+from . import setting
+from .queue import StdOut
 
 from PySide6.QtCore import SignalInstance
 
 from intelligenes import selection, classification, intelligenes
-from utils.queue import StdOut
 
 
 def feature_selection_pipeline(

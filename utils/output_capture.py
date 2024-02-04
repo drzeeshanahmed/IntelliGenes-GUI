@@ -39,7 +39,7 @@ class Worker:
         try:
             if self._callback:
                 self._callback()
-        except:
+        except Exception:
             pass
         
     def is_alive(self):

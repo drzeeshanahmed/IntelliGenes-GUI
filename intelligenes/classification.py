@@ -1,10 +1,8 @@
-# Data Tools
 import matplotlib as mlp
+
 # Non-interactive backend so that file saving doesn't consume too much memory (no need for mlp GUI)
 mlp.use("Agg")
 import matplotlib.pyplot as plt
-
-from utils.queue import StdOut
 
 import numpy as np
 import pandas as pd
@@ -18,6 +16,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+
 from xgboost import XGBClassifier
 
 # SHAP scores
@@ -29,6 +28,8 @@ from datetime import datetime
 import os
 from pathlib import Path
 from typing import Any
+
+from utils.queue import StdOut
 
 
 def with_tuning(classifier, rand_state, nsplits: int, parameters: dict[str, Any]):
@@ -59,7 +60,9 @@ def rf_classifier(
                 "min_samples_leaf": np.concatenate([np.arange(1, 11), [100, 150]]),
             },
         )
-    return clf.fit(x, y)
+
+    result = clf.fit(x, y)
+    return result.best_estimator_ if tuning else result
 
 
 def svm_classifier(
@@ -79,7 +82,9 @@ def svm_classifier(
                 "C": [0.01, 0.1, 1, 10, 50, 100, 500, 1000, 5000, 10000],
             },
         )
-    return clf.fit(x, y)
+
+    result = clf.fit(x, y)
+    return result.best_estimator_ if tuning else result
 
 
 def xgb_classifier(
@@ -100,7 +105,9 @@ def xgb_classifier(
                 "learning_rate": [0.001, 0.01, 0.1, 1],
             },
         )
-    return clf.fit(x, y)
+
+    result = clf.fit(x, y)
+    return result.best_estimator_ if tuning else result
 
 
 def knn_classifier(
@@ -120,7 +127,9 @@ def knn_classifier(
                 "p": [1, 2],
             },
         )
-    return clf.fit(x, y)
+
+    result = clf.fit(x, y)
+    return result.best_estimator_ if tuning else result
 
 
 def mlp_classifier(
@@ -150,11 +159,18 @@ def mlp_classifier(
                 "momentum": [0.1, 0.2, 0.5, 0.9],
             },
         )
-    return clf.fit(x, y)
+
+    result = clf.fit(x, y)
+    return result.best_estimator_ if tuning else result
 
 
 def voting_classifier(
-    x: DataFrame, y: DataFrame, voting: str, names: list[str], classifiers: list[Any], stdout: StdOut
+    x: DataFrame,
+    y: DataFrame,
+    voting: str,
+    names: list[str],
+    classifiers: list[Any],
+    stdout: StdOut,
 ):
     stdout.write("Voting Classifier")
     return VotingClassifier(

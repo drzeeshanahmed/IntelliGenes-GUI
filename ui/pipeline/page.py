@@ -2,8 +2,8 @@ from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QComboBox
 from PySide6.QtCore import SignalInstance
 from typing import Callable
 
-from ui.pipeline.controls import PipelineControls
-from ui.pipeline.console import PipelineConsole
+from .controls import PipelineControls
+from .console import PipelineConsole
 from utils.output_capture import CaptureOutput
 from utils.queue import StdOut
 

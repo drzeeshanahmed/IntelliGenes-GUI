@@ -1,22 +1,4 @@
 from collections import deque
-# class StdOut:
-#     def __init__(self) -> None:
-#         self._queue = SimpleQueue()
-    
-#     def write(self, string: str):
-#         self._queue.put_nowait(string)
-    
-#     def read(self):
-#         if not self.empty():
-#             return self._queue.get_nowait()
-        
-    
-#     def empty(self):
-#         return self._queue.empty()
-    
-#     def close(self):
-#         pass
-
 import os
 class StdOut:
     def __init__(self) -> None:
@@ -29,14 +11,14 @@ class StdOut:
     def write(self, string: str):
         try:
             self._ostream.write(string + "\n")
-        except:
+        except Exception:
             pass
     
     def read(self):
         if not self._istream.closed:
             try:
                 return self._istream.readline()
-            except:
+            except Exception:
                 return None
         elif len(self._reversed_final) > 0:
             return self._reversed_final.popleft()

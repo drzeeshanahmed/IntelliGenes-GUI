@@ -10,8 +10,8 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QDir, Signal, Qt
 
-from ui.files.png_renderer import ImageRenderer
-from ui.files.table_renderer import TableRenderer
+from .png_renderer import ImageRenderer
+from .table_renderer import TableRenderer
 
 
 class FilesPage(QWidget):
