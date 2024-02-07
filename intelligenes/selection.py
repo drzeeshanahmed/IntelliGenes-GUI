@@ -14,7 +14,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 
-from utils.queue import StdOut
+from utils.stdout import StdOut
 
 
 def recursive_elim(

@@ -1,18 +1,18 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QComboBox
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QComboBox
 from PySide6.QtCore import SignalInstance
 from typing import Callable
 
 from .controls import PipelineControls
 from .console import PipelineConsole
-from utils.output_capture import CaptureOutput
-from utils.queue import StdOut
+from utils.capture_output import CaptureOutput
+from utils.stdout import StdOut
+from utils.setting import Setting
 
-from utils.intelligenes_pipelines import (
+from intelligenes.intelligenes_pipelines import (
     select_and_classify_pipeline,
     classification_pipeline,
     feature_selection_pipeline,
 )
-from utils.setting import Setting
 
 class PipelinePage(QWidget):
     def __init__(self, changeDirSignal: SignalInstance) -> None:
@@ -27,7 +27,7 @@ class PipelinePage(QWidget):
             classification_pipeline(changeDirSignal, self.stdout),
         ]
 
-        layout = QHBoxLayout()
+        layout = QVBoxLayout()
         self.setLayout(layout)
 
         combo_box = QComboBox()

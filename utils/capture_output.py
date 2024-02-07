@@ -5,7 +5,7 @@ from threading import Thread
 from PySide6.QtCore import Signal, QThread
 from typing import Callable
 
-from utils.queue import StdOut
+from utils.stdout import StdOut
 
 class Worker:
     def __init__(self, stdout: StdOut, callback):

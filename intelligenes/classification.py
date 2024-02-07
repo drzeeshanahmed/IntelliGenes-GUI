@@ -29,7 +29,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from utils.queue import StdOut
+from utils.stdout import StdOut
 
 
 def with_tuning(classifier, rand_state, nsplits: int, parameters: dict[str, Any]):
