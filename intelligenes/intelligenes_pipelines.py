@@ -71,7 +71,6 @@ def classification_pipeline(
                 "Files",
                 [
                     setting.CSVSetting("CIGT File", None),
-                    setting.CSVSetting("Selected Features", None),
                     setting.DirectorySetting("Output", None),
                 ],
             ),
@@ -111,8 +110,7 @@ def classification_pipeline(
         else:
             classification.main(
                 stdout=stdout,
-                cgit_file=config.get("CIGT File"),
-                features_file=config.get("Selected Features"),
+                selected_cgit_file=config.get("CIGT File"),
                 output_dir=config.get("Output"),
                 rand_state=config.get("Random State"),
                 test_size=config.get("Test Size"),

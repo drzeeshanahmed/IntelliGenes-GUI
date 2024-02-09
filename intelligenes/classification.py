@@ -195,8 +195,7 @@ def expression_direction(*scores: list[float]):
 
 
 def classify_features(
-    X: DataFrame,
-    Y: Series,
+    input_df: DataFrame,
     stdout: StdOut,
     rand_state: int,
     test_size: float,
@@ -214,6 +213,10 @@ def classify_features(
     output_dir: str,
     stem: str,
 ):
+    parsed_input_df = input_df.drop(columns=["ID"])
+    X = parsed_input_df.drop(columns=["Type"])
+    Y = parsed_input_df["Type"]
+
     stdout.write("Feature Classification")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -379,8 +382,7 @@ def classify_features(
 
 def main(
     stdout: StdOut,
-    cgit_file: str,
-    features_file: str,
+    selected_cgit_file: str,
     output_dir: str,
     rand_state: int,
     test_size: float,
@@ -396,21 +398,11 @@ def main(
     use_knn: bool,
     use_mlp: bool,
 ):
-    # Same as what is outputed from `selection.py`
-    selected_column = "Features"
-    y_label_col = "Type"
-
-    stdout.write(f"Reading Data from {cgit_file}")
-    input_df = pd.read_csv(cgit_file).drop(columns=["ID"])
-    stdout.write(f"Reading Selected Features from {features_file}")
-    selected = pd.read_csv(features_file)[selected_column].values.flatten().tolist()
-
-    X = input_df[selected]
-    Y = input_df[y_label_col]
+    stdout.write(f"Reading DataFrame from {selected_cgit_file}")
+    input_df = pd.read_csv(selected_cgit_file)
 
     classify_features(
-        X,
-        Y,
+        input_df=input_df,
         rand_state=rand_state,
         test_size=test_size,
         use_normalization=use_normalization,
@@ -425,6 +417,6 @@ def main(
         use_visualizations=use_visualizations,
         use_igenes=use_igenes,
         output_dir=output_dir,
-        stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
+        stem=f"{Path(selected_cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
         stdout=stdout,
     )

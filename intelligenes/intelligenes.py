@@ -35,18 +35,11 @@ def main(
     stdout: StdOut,
 ):  
     y_label_col = "Type"
-    output_features_col = "Features"
 
     stdout.write(f"Reading DataFrame from {cgit_file}")
-
-    input_df = pd.read_csv(cgit_file).drop(columns=["ID"])
-    X = input_df.drop(columns=[y_label_col])
-    Y = input_df[y_label_col]
-
-    selected = select_features(
-        X,
-        Y,
-        features_col=output_features_col,
+    input_df = pd.read_csv(cgit_file)
+    selected_df = select_features(
+        input_df=input_df,
         rand_state=rand_state,
         test_size=test_size,
         use_normalization=use_normalization,
@@ -58,13 +51,9 @@ def main(
         stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
         stdout=stdout,
     )
-
-    X = input_df[selected]
-    Y = input_df[y_label_col]
     
     classify_features(
-        X,
-        Y,
+        input_df=selected_df,
         rand_state=rand_state,
         test_size=test_size,
         use_normalization=use_normalization,

@@ -79,11 +79,11 @@ def min_max_scalar(x: DataFrame) -> DataFrame:
 
 
 ### Calculates the most relevant features from `input` needed to calculate
+## Needs a Type and ID column, and returns the same DataFrame with only selected
+## features present
 def select_features(
-    X: DataFrame,
-    Y: Series,
+    input_df: DataFrame,
     stdout: StdOut,
-    features_col: str,
     test_size: int,
     rand_state: int,
     use_normalization: bool,
@@ -93,13 +93,20 @@ def select_features(
     use_pearson: bool,
     output_dir: str,
     stem: str,
-):
+) -> DataFrame:
+    id_column = "ID"
+    y_label_col = "Type"
+    parsed_input_df = input_df.drop(columns=[id_column])
+    X = parsed_input_df.drop(columns=[y_label_col])
+    Y = parsed_input_df[y_label_col]
+
     stdout.write("Selecting Important Features")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
     x, _, y, _ = train_test_split(X, Y, test_size=test_size, random_state=rand_state)
 
+    features_col = "Features"
     rfe_col = "RFE Rankings"
     anova_col = "ANOVA (p-value)"
     chi2_col = "Chi-Square Test (p-value)"
@@ -110,7 +117,7 @@ def select_features(
         x = min_max_scalar(x)
 
     results: tuple[list[DataFrame], list[Series]] = []
-    
+
     if use_rfe:
         stdout.write("Recursive Feature Elimination")
         result = recursive_elim(x, y, rand_state, features_col, rfe_col)
@@ -131,14 +138,14 @@ def select_features(
     if len(results) == 0:
         stdout.write("No selectors were used. Exiting...")
         return
-    
+
     all = None
     selected_mask = None
     for result, mask in results:
         all = result if all is None else all.merge(result, on=features_col)
         selected_mask = mask if selected_mask is None else selected_mask & mask
-    
-    selected = all.loc[selected_mask]
+
+    selected: DataFrame = all.loc[selected_mask]
 
     all_path = os.path.join(output_dir, f"{stem}_All-Features.csv")
     selected_path = os.path.join(output_dir, f"{stem}_Selected-Features.csv")
@@ -147,9 +154,18 @@ def select_features(
     selected.to_csv(selected_path, index=False)
     stdout.write(f"Saved all feature rankings to {all_path}")
     stdout.write(f"Saved selected feature rankings to {selected_path}")
-    stdout.write("Finished Feature Selection")
 
-    return selected[features_col]
+    selected_cigt_path = os.path.join(output_dir, f"{stem}_Selected-CIGT-File.csv")
+    selected_columns = [id_column, y_label_col]
+    selected_columns.extend(selected[features_col].tolist())
+    
+    selected_df = input_df[selected_columns]
+    selected_df.to_csv(selected_cigt_path, index=False)
+    stdout.write(f"Saved the selected features CIGT file to {selected_path}")
+
+    stdout.write("Finished Feature Selection")
+    
+    return selected_df
 
 
 def main(
@@ -164,20 +180,12 @@ def main(
     use_anova: bool,
     use_chi2: bool,
 ):
-    y_label_col = "Type"
-    output_features_col = "Features"
-
     stdout.write(f"Reading DataFrame from {cgit_file}")
-
-    input_df = pd.read_csv(cgit_file).drop(columns=["ID"])
-    X = input_df.drop(columns=[y_label_col])
-    Y = input_df[y_label_col]
+    input_df = pd.read_csv(cgit_file)
 
     select_features(
-        X,
-        Y,
+        input_df=input_df,
         stdout=stdout,
-        features_col=output_features_col,
         rand_state=rand_state,
         test_size=test_size,
         use_normalization=use_normalization,
