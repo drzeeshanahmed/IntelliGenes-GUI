@@ -1,14 +1,17 @@
-from typing import Callable
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QComboBox
+# UI libraries
 from PySide6.QtCore import SignalInstance
+from PySide6.QtWidgets import QVBoxLayout, QPushButton, QComboBox
 
-from ui.components.page import Page
-
+# Custom UI libraries
 from .controls import PipelineControls
 from .console import PipelineConsole
+from ui.components.page import Page
+
+# Custom utilities
 from utils.capture_output import CaptureOutput
 from utils.stdout import StdOut
 
+# Intelligenes pipelines
 from intelligenes.intelligenes_pipelines import (
     select_and_classify_pipeline,
     classification_pipeline,

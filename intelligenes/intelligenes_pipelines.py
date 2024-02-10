@@ -1,32 +1,43 @@
+# Miscellaneous System libraries
 from typing import Callable, TypeAlias
-from utils import setting
+
+# Custom utilities
+from utils.setting import (
+    Config,
+    Group,
+    BoolSetting,
+    IntSetting,
+    FloatSetting,
+    StrSetting,
+    StrChoiceSetting,
+)
 from utils.stdout import StdOut
 
-from intelligenes import selection, classification, intelligenes
+# IntelliGenes pipelines
+from . import selection, classification, intelligenes
 
-PipelineResult: TypeAlias = tuple[
-    str, setting.Config, Callable[[str, str, StdOut], None]
-]
+# Custom type alias
+PipelineResult: TypeAlias = tuple[str, Config, Callable[[str, str, StdOut], None]]
 
 
 def feature_selection_pipeline() -> PipelineResult:
-    config = setting.Config(
+    config = Config(
         [
-            setting.Group(
+            Group(
                 "Parameters",
                 [
-                    setting.IntSetting("Random State", 42, min=0, max=100, step=1),
-                    setting.FloatSetting("Test Size", 0.3, min=0, max=1, step=0.05),
-                    setting.BoolSetting("Normalize", False),
+                    IntSetting("Random State", 42, min=0, max=100, step=1),
+                    FloatSetting("Test Size", 0.3, min=0, max=1, step=0.05),
+                    BoolSetting("Normalize", False),
                 ],
             ),
-            setting.Group(
+            Group(
                 "Selectors",
                 [
-                    setting.BoolSetting("Recursive Feature Elimination", True),
-                    setting.BoolSetting("Pearson's Correlation", True),
-                    setting.BoolSetting("Analysis of Variance", True),
-                    setting.BoolSetting("Chi-Squared Test", True),
+                    BoolSetting("Recursive Feature Elimination", True),
+                    BoolSetting("Pearson's Correlation", True),
+                    BoolSetting("Analysis of Variance", True),
+                    BoolSetting("Chi-Squared Test", True),
                 ],
             ),
         ]
@@ -54,29 +65,29 @@ def feature_selection_pipeline() -> PipelineResult:
 
 
 def classification_pipeline() -> PipelineResult:
-    config = setting.Config(
+    config = Config(
         [
-            setting.Group(
+            Group(
                 "Parameters",
                 [
-                    setting.IntSetting("Random State", 42, min=0, max=100, step=1),
-                    setting.FloatSetting("Test Size", 0.3, min=0, max=1, step=0.05),
-                    setting.IntSetting("N Splits", 5, min=1, max=20, step=1),
-                    setting.BoolSetting("Normalize", False),
-                    setting.BoolSetting("Tune", False),
-                    setting.StrChoiceSetting("Voting", "soft", ["soft", "hard"]),
-                    setting.BoolSetting("Calculate I-Genes", True),
-                    setting.BoolSetting("Create Visualizations", True),
+                    IntSetting("Random State", 42, min=0, max=100, step=1),
+                    FloatSetting("Test Size", 0.3, min=0, max=1, step=0.05),
+                    IntSetting("N Splits", 5, min=1, max=20, step=1),
+                    BoolSetting("Normalize", False),
+                    BoolSetting("Tune", False),
+                    StrChoiceSetting("Voting", "soft", ["soft", "hard"]),
+                    BoolSetting("Calculate I-Genes", True),
+                    BoolSetting("Create Visualizations", True),
                 ],
             ),
-            setting.Group(
+            Group(
                 "Classifiers",
                 [
-                    setting.BoolSetting("Random Forest", True),
-                    setting.BoolSetting("Support Vector Machine", True),
-                    setting.BoolSetting("XGBoost", True),
-                    setting.BoolSetting("K-Nearest Neighbors", True),
-                    setting.BoolSetting("Multi-Layer Perceptron", True),
+                    BoolSetting("Random Forest", True),
+                    BoolSetting("Support Vector Machine", True),
+                    BoolSetting("XGBoost", True),
+                    BoolSetting("K-Nearest Neighbors", True),
+                    BoolSetting("Multi-Layer Perceptron", True),
                 ],
             ),
         ]
@@ -110,38 +121,38 @@ def classification_pipeline() -> PipelineResult:
 
 
 def select_and_classify_pipeline() -> PipelineResult:
-    config = setting.Config(
+    config = Config(
         [
-            setting.Group(
+            Group(
                 "Parameters",
                 [
-                    setting.IntSetting("Random State", 42, min=0, max=100, step=1),
-                    setting.FloatSetting("Test Size", 0.3, min=0, max=1, step=0.05),
-                    setting.BoolSetting("Normalize", False),
-                    setting.IntSetting("N Splits", 5, min=1, max=20, step=1),
-                    setting.BoolSetting("Tune", False),
-                    setting.StrChoiceSetting("Voting", "soft", ["soft", "hard"]),
-                    setting.BoolSetting("Calculate I-Genes", True),
-                    setting.BoolSetting("Create Visualizations", True),
+                    IntSetting("Random State", 42, min=0, max=100, step=1),
+                    FloatSetting("Test Size", 0.3, min=0, max=1, step=0.05),
+                    BoolSetting("Normalize", False),
+                    IntSetting("N Splits", 5, min=1, max=20, step=1),
+                    BoolSetting("Tune", False),
+                    StrChoiceSetting("Voting", "soft", ["soft", "hard"]),
+                    BoolSetting("Calculate I-Genes", True),
+                    BoolSetting("Create Visualizations", True),
                 ],
             ),
-            setting.Group(
+            Group(
                 "Selectors",
                 [
-                    setting.BoolSetting("Recursive Feature Elimination", True),
-                    setting.BoolSetting("Pearson's Correlation", True),
-                    setting.BoolSetting("Analysis of Variance", True),
-                    setting.BoolSetting("Chi-Squared Test", True),
+                    BoolSetting("Recursive Feature Elimination", True),
+                    BoolSetting("Pearson's Correlation", True),
+                    BoolSetting("Analysis of Variance", True),
+                    BoolSetting("Chi-Squared Test", True),
                 ],
             ),
-            setting.Group(
+            Group(
                 "Classifiers",
                 [
-                    setting.BoolSetting("Random Forest", True),
-                    setting.BoolSetting("Support Vector Machine", True),
-                    setting.BoolSetting("XGBoost", True),
-                    setting.BoolSetting("K-Nearest Neighbors", True),
-                    setting.BoolSetting("Multi-Layer Perceptron", True),
+                    BoolSetting("Random Forest", True),
+                    BoolSetting("Support Vector Machine", True),
+                    BoolSetting("XGBoost", True),
+                    BoolSetting("K-Nearest Neighbors", True),
+                    BoolSetting("Multi-Layer Perceptron", True),
                 ],
             ),
         ]

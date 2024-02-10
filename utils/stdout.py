@@ -1,5 +1,8 @@
+# Miscellaneous system libraries
 from collections import deque
 import os
+
+
 class StdOut:
     def __init__(self) -> None:
         self._istream = None
@@ -13,7 +16,7 @@ class StdOut:
             self._ostream.write(string + "\n")
         except Exception:
             pass
-    
+
     def read(self):
         if not self._istream.closed:
             try:
@@ -24,11 +27,10 @@ class StdOut:
             return self._reversed_final.popleft()
         else:
             return None
-        
-    
+
     def can_read(self):
         return not self._istream.closed or len(self._reversed_final) > 0
-    
+
     def close(self):
         # Order is important. Closing ostream allows istream to recieve an EOF
         self._ostream.close()
@@ -37,7 +39,7 @@ class StdOut:
             self._reversed_final.append(line)
 
         self._istream.close()
-    
+
     def open(self):
         self._reversed_final.clear()
         _r, _w = os.pipe()

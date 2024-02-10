@@ -1,11 +1,16 @@
+# UI libraries
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QComboBox,
     QPushButton,
 )
-from PySide6.QtCore import Qt
+
+# Miscellaneous system libraries
 from typing import Callable
+
+# Custom utilities
 from utils.setting import Config
 
 

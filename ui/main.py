@@ -1,11 +1,12 @@
-import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QTabWidget
+# UI Libraries
 from PySide6.QtCore import Signal
-from pandas import DataFrame
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QTabWidget
 
+# Miscellaneous system libraries
+import sys
+
+# Custom UI components
 from ui.components.page import Page
-
-# Custom Components
 from .input.page import InputPage
 from .files.page import OutputFilesPage
 from .pipeline.page import PipelinePage

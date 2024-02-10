@@ -1,15 +1,16 @@
-# Data Tools
+# Data Manipulation
 import pandas as pd
+
+# Misc System libraries
+from datetime import datetime
+from pathlib import Path
+
+# Custom utilities
+from utils.stdout import StdOut
 
 # Intelligenes
 from .selection import select_features
 from .classification import classify_features
-
-# Misc
-from datetime import datetime
-from pathlib import Path
-
-from utils.stdout import StdOut
 
 
 def main(
@@ -33,9 +34,7 @@ def main(
     use_knn: bool,
     use_mlp: bool,
     stdout: StdOut,
-):  
-    y_label_col = "Type"
-
+):
     stdout.write(f"Reading DataFrame from {cgit_file}")
     input_df = pd.read_csv(cgit_file)
     selected_df = select_features(
@@ -51,7 +50,7 @@ def main(
         stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
         stdout=stdout,
     )
-    
+
     classify_features(
         input_df=selected_df,
         rand_state=rand_state,
@@ -69,7 +68,7 @@ def main(
         use_igenes=use_igenes,
         output_dir=output_dir,
         stem=f"{Path(cgit_file).stem}_{datetime.now().strftime('%m-%d-%Y-%I-%M-%S-%p')}",
-        stdout=stdout
+        stdout=stdout,
     )
 
     stdout.write("Finished Intelligenes Pipeline")

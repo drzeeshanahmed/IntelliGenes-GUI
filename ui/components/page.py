@@ -1,9 +1,9 @@
+# UI libraries
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import SignalInstance
 
 
 class Page(QWidget):
-
     def __init__(
         self,
         inputFile: SignalInstance,

@@ -1,20 +1,20 @@
-import os
-from typing import Any
+# UI Libraries
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget,
-    QFileDialog,
     QComboBox,
     QSpinBox,
     QDoubleSpinBox,
     QLineEdit,
     QCheckBox,
-    QPushButton,
     QLabel,
     QVBoxLayout,
     QHBoxLayout,
     QGroupBox,
 )
-from PySide6.QtCore import Qt
+
+# System libraries
+from typing import Any
 
 
 class Setting:
@@ -170,81 +170,6 @@ class StrSetting(Setting):
         container_layout.addWidget(QLabel(self.name))
         container_layout.addStretch(1)
         container_layout.addWidget(le)
-
-        return widget
-
-
-class CSVSetting(Setting):
-    def __init__(self, name: str, path):
-        super().__init__(name, path)
-
-    def _getText(self):
-        # self.value is either empty or None
-        return (
-            os.path.basename(self.value)
-            if self.value is not None
-            else "Select CSV File"
-        )
-
-    def _getFile(self, widget: QPushButton):
-        filename, ok = QFileDialog.getOpenFileName(
-            parent=widget,
-            caption="Select a CSV File",
-            dir="",
-            filter="CSV (*.csv)",
-            selectedFilter="",
-        )
-        if filename:
-            self.set(filename)
-        widget.setText(self._getText())
-
-    def widget(self):
-        widget = QWidget()
-        container_layout = QHBoxLayout()
-        container_layout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(container_layout)
-
-        pb = QPushButton(self._getText())
-        pb.clicked.connect(lambda: self._getFile(pb))
-
-        container_layout.addWidget(QLabel(self.name))
-        container_layout.addStretch(1)
-        container_layout.addWidget(pb)
-
-        return widget
-
-
-class DirectorySetting(Setting):
-    def __init__(self, name: str, path):
-        super().__init__(name, path)
-
-    def _getText(self):
-        # self.value is either empty or None
-        return (
-            os.path.basename(self.value)
-            if self.value is not None
-            else "Select Directory"
-        )
-
-    def _getDir(self, widget: QPushButton):
-        dir = QFileDialog.getExistingDirectory()
-
-        if dir:
-            self.set(dir)
-        widget.setText(self._getText())
-
-    def widget(self):
-        widget = QWidget()
-        container_layout = QHBoxLayout()
-        container_layout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(container_layout)
-
-        pb = QPushButton(self._getText())
-        pb.clicked.connect(lambda: self._getDir(pb))
-
-        container_layout.addWidget(QLabel(self.name))
-        container_layout.addStretch(1)
-        container_layout.addWidget(pb)
 
         return widget
 

@@ -1,13 +1,14 @@
+# UI libraries
+from PySide6.QtCore import SignalInstance, Qt
 from PySide6.QtWidgets import (
-    QWidget,
     QVBoxLayout,
     QLabel,
     QFileDialog,
     QPushButton,
 )
-from PySide6.QtCore import SignalInstance, Qt
-from ui.components.page import Page
 
+# Custom libraries
+from ui.components.page import Page
 from ui.components.table_renderer import TableRenderer
 
 

@@ -1,19 +1,20 @@
-# Data Tools
+# Data Manipulation libraries
 import pandas as pd
 from pandas import DataFrame, Series
 
-# Machine Learning
+# Machine Learning libraries
 from scipy.stats import pearsonr
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_selection import SelectKBest, chi2, f_classif, RFE
 from sklearn.tree import DecisionTreeClassifier
 
-# Misc
+# Misc System libraries
 from datetime import datetime
 import os
 from pathlib import Path
 
+# Utilities libraries
 from utils.stdout import StdOut
 
 

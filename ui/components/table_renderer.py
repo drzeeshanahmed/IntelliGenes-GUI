@@ -1,4 +1,7 @@
+# Data manipulation libraries
 import pandas as pd
+
+# UI libraries
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
 
@@ -17,5 +20,5 @@ class TableRenderer(QTableWidget):
             for c in range(df.shape[1]):
                 widget = QTableWidgetItem(str(df.iloc[r, c]))
                 self.setItem(r, c, widget)
-        
+
         self.resizeColumnsToContents()

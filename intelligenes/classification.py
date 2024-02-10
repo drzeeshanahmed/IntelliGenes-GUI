@@ -1,14 +1,17 @@
+# Data Manipulation Libraries
+import numpy as np
+import pandas as pd
+from pandas import DataFrame, Series
+
+# Visualization Libraries
 import matplotlib as mlp
 
 # Non-interactive backend so that file saving doesn't consume too much memory (no need for mlp GUI)
 mlp.use("Agg")
 import matplotlib.pyplot as plt
 
-import numpy as np
-import pandas as pd
-from pandas import DataFrame, Series
 
-# Machine Learning
+# Machine Learning Libraries
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import GridSearchCV, KFold, train_test_split
@@ -16,19 +19,19 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-
 from xgboost import XGBClassifier
 
 # SHAP scores
 from shap import summary_plot, Explainer
 from shap.maskers import Independent
 
-# Misc
+# Miscellaneous System libraries
 from datetime import datetime
 import os
 from pathlib import Path
 from typing import Any
 
+# Custom Utilities
 from utils.stdout import StdOut
 
 
