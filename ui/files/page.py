@@ -8,18 +8,18 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QPushButton,
 )
-from PySide6.QtCore import QDir, Signal, Qt
+from PySide6.QtCore import QDir, Signal, Qt, SignalInstance
 
 from .png_renderer import ImageRenderer
 from .table_renderer import TableRenderer
 
 
 class FilesPage(QWidget):
-    selectedDir = Signal(str)
     selectedFile = Signal(str)
 
-    def __init__(self) -> None:
+    def __init__(self, outputDir: SignalInstance) -> None:
         super().__init__()
+        self.outputDir = outputDir
         self.rendered_widget = None
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
@@ -35,18 +35,18 @@ class FilesPage(QWidget):
             lambda i: self.selectedFile.emit(i.data(Qt.ItemDataRole.UserRole))
         )
 
-        self.selectedDir.connect(
+        self.outputDir.connect(
             lambda text: button.setText("Select Directory" if not text else text)
         )
-        self.selectedDir.connect(self.updateDirectoryWidgets)
+        self.outputDir.connect(self.updateDirectoryWidgets)
         self.selectedFile.connect(self.handleSelectedFile)
         self.selectedFile.emit("")
-        self.selectedDir.emit("")
+        self.outputDir.emit("")
 
     def browseDirectory(self):
         dir = QFileDialog.getExistingDirectory()
         if dir:
-            self.selectedDir.emit(dir)
+            self.outputDir.emit(dir)
 
     def updateDirectoryWidgets(self, path):
         self.list.clear()

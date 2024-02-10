@@ -8,7 +8,7 @@ from typing import Callable
 from utils.stdout import StdOut
 
 class Worker:
-    def __init__(self, stdout: StdOut, callback):
+    def __init__(self, stdout: StdOut, callback: Callable[[], None]):
         super().__init__()
         self._process = None
         self._stdout = stdout
