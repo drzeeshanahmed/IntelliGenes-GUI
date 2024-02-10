@@ -2,6 +2,8 @@ from typing import Callable
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QComboBox
 from PySide6.QtCore import SignalInstance
 
+from ui.components.page import Page
+
 from .controls import PipelineControls
 from .console import PipelineConsole
 from utils.capture_output import CaptureOutput
@@ -15,20 +17,23 @@ from intelligenes.intelligenes_pipelines import (
 )
 
 
-class PipelinePage(QWidget):
+class PipelinePage(Page):
     def __init__(
-        self, inputFileSignal: SignalInstance, outputDirSignal: SignalInstance
+        self,
+        inputFile: SignalInstance,
+        outputDir: SignalInstance,
+        onTabSelected: SignalInstance,
     ) -> None:
-        super().__init__()
+        super().__init__(inputFile, outputDir, onTabSelected)
 
         self.stdout = StdOut()
         self.output = CaptureOutput(self.stdout)
 
-        self.inputFile = None
-        self.outputDir = None
+        self.inputFilePath = None
+        self.outputDirPath = None
 
-        inputFileSignal.connect(self._setFile)
-        outputDirSignal.connect(self._setDir)
+        self.inputFile.connect(self._setFile)
+        self.outputDir.connect(self._setDir)
 
         pipelines: list[PipelineResult] = [
             select_and_classify_pipeline(),
@@ -56,10 +61,7 @@ class PipelinePage(QWidget):
             # The callback is necessary to re-emit the output directory after the process is done
             # This allows any slots listening to the signal to update with the contents of the directory
             # after it is finished
-            lambda: self.run(
-                pipelines[combo_box.currentIndex()],
-                lambda: outputDirSignal.emit(self.outputDir),
-            )
+            lambda: self.run(pipelines[combo_box.currentIndex()])
         )
 
         controls = PipelineControls(pipelines, run_button, combo_box)
@@ -69,24 +71,23 @@ class PipelinePage(QWidget):
         layout.addWidget(console)
         layout.setStretch(1, 2)
 
-    def run_pipeline(self, pipeline: PipelineResult, callback: Callable[[], None]):
+    def run_pipeline(self, pipeline: PipelineResult):
         # validate pipeline
-        if not self.inputFile:
+        if not self.inputFilePath:
             self.stdout.write("Select input CIGT file")
-        elif not self.outputDir:
+        elif not self.outputDirPath:
             self.stdout.write("Select output directory")
         else:
-            pipeline[2](self.inputFile, self.outputDir, self.stdout)
-            callback()
+            pipeline[2](self.inputFilePath, self.outputDirPath, self.stdout)
 
     # Run process in a separate thread and capture output for the console
-    def run(self, pipeline: PipelineResult, callback: Callable[[], None]):
+    def run(self, pipeline: PipelineResult):
         self.stdout.open()
-        self.output.load_job(lambda: self.run_pipeline(pipeline, callback))
+        self.output.load_job(lambda: self.run_pipeline(pipeline))
         self.output.start()  # closes stdout when finished (need to reopen)
 
     def _setFile(self, text: str):
-        self.inputFile = text
+        self.inputFilePath = text
 
     def _setDir(self, text: str):
-        self.outputDir = text
+        self.outputDirPath = text

@@ -6,14 +6,20 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6.QtCore import SignalInstance, Qt
+from ui.components.page import Page
 
-from ui.files.table_renderer import TableRenderer
+from ui.components.table_renderer import TableRenderer
 
-class InputPage(QWidget):
+
+class InputPage(Page):
     def __init__(
-        self, inputFile: SignalInstance, outputDir: SignalInstance
+        self,
+        inputFile: SignalInstance,
+        outputDir: SignalInstance,
+        onTabSelected: SignalInstance,
     ) -> None:
-        super().__init__()
+        super().__init__(inputFile, outputDir, onTabSelected)
+
         self.rendered_widget = None
         self._layout = QVBoxLayout()
         self._layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -24,19 +30,19 @@ class InputPage(QWidget):
         self._layout.addWidget(file_btn)
         self._layout.addWidget(output_btn)
 
-        inputFile.connect(
+        self.inputFile.connect(
             lambda text: file_btn.setText("Select CIGT File" if not text else text)
         )
-        inputFile.connect(self.handleSelectedFile)
+        self.inputFile.connect(self.handleSelectedFile)
 
-        outputDir.connect(
+        self.outputDir.connect(
             lambda text: output_btn.setText(
                 "Select Output Directory" if not text else text
             )
         )
 
-        file_btn.clicked.connect(lambda: inputFile.emit(self.selectFile()))
-        output_btn.clicked.connect(lambda: outputDir.emit(self.selectDirectory()))
+        file_btn.clicked.connect(lambda: self.inputFile.emit(self.selectFile()))
+        output_btn.clicked.connect(lambda: self.outputDir.emit(self.selectDirectory()))
 
     def selectFile(self):
         filename, ok = QFileDialog.getOpenFileName(

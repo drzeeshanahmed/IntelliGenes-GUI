@@ -1,6 +1,4 @@
-
 from PySide6.QtWidgets import (
-    QWidget,
     QVBoxLayout,
     QListWidget,
     QListWidgetItem,
@@ -10,23 +8,29 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QDir, Signal, Qt, SignalInstance
 
-from .png_renderer import ImageRenderer
-from .table_renderer import TableRenderer
+from ui.components.page import Page
+from ui.components.png_renderer import ImageRenderer
+from ui.components.table_renderer import TableRenderer
 
 
-class FilesPage(QWidget):
+class OutputFilesPage(Page):
     selectedFile = Signal(str)
 
-    def __init__(self, outputDir: SignalInstance) -> None:
-        super().__init__()
-        self.outputDir = outputDir
+    def __init__(
+        self,
+        inputFile: SignalInstance,
+        outputDir: SignalInstance,
+        onTabSelected: SignalInstance,
+    ) -> None:
+        super().__init__(inputFile, outputDir, onTabSelected)
+        self.path = None
+
         self.rendered_widget = None
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
 
-        button = QPushButton()
-        button.clicked.connect(self.browseDirectory)
-        self._layout.addWidget(button)
+        label = QLabel("Select an Output Directory")
+        self._layout.addWidget(label)
 
         self.list = QListWidget()
         self._layout.addWidget(self.list)
@@ -35,26 +39,28 @@ class FilesPage(QWidget):
             lambda i: self.selectedFile.emit(i.data(Qt.ItemDataRole.UserRole))
         )
 
+        self.outputDir.connect(self.setOutputPath)
         self.outputDir.connect(
-            lambda text: button.setText("Select Directory" if not text else text)
+            lambda text: label.setText(text if text else "Select an Output Directory")
         )
-        self.outputDir.connect(self.updateDirectoryWidgets)
+        self.onTabSelected.connect(self.updateDirectoryWidgets)
         self.selectedFile.connect(self.handleSelectedFile)
-        self.selectedFile.emit("")
-        self.outputDir.emit("")
+
+    def setOutputPath(self, path: str):
+        self.path = path
 
     def browseDirectory(self):
         dir = QFileDialog.getExistingDirectory()
         if dir:
             self.outputDir.emit(dir)
 
-    def updateDirectoryWidgets(self, path):
+    def updateDirectoryWidgets(self):
         self.list.clear()
 
-        if not path:
+        if not self.path:
             return
 
-        dir = QDir(path)
+        dir = QDir(self.path)
         dir.setNameFilters(["*.csv", "*.png"])
         dir.setFilter(QDir.Filter.Files)
         files = dir.entryInfoList()
