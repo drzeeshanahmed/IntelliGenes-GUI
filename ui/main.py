@@ -10,6 +10,7 @@ from ui.components.page import Page
 from .input.page import InputPage
 from .files.page import OutputFilesPage
 from .pipeline.page import PipelinePage
+from .about.page import AboutPage
 
 
 class MainWindow(QMainWindow):
@@ -21,6 +22,7 @@ class MainWindow(QMainWindow):
     inputPageSignal = Signal()
     pipelinePageSignal = Signal()
     filesPageSignal = Signal()
+    demoPageSignal = Signal()
 
 
     def __init__(self):
@@ -33,6 +35,7 @@ class MainWindow(QMainWindow):
             ("Input", InputPage(self.inputFile, self.outputDir, self.inputPageSignal)),
             ("Pipeline", PipelinePage(self.inputFile, self.outputDir, self.pipelinePageSignal)),
             ("Files", OutputFilesPage(self.inputFile, self.outputDir, self.filesPageSignal)),
+            ("About", AboutPage(self.inputFile, self.outputDir, self.demoPageSignal)),
         ]
         def select_tab(index: int):
             tabs[index][1].onTabSelected.emit()
