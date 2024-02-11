@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 
 # Custom libraries
 from ui.components.page import Page
-from ui.components.table_renderer import TableRenderer
+from ui.components.table_editor import TableEditor
 
 
 class InputPage(Page):
@@ -42,8 +42,8 @@ class InputPage(Page):
             )
         )
 
-        file_btn.clicked.connect(lambda: self.inputFile.emit(self.selectFile()))
-        output_btn.clicked.connect(lambda: self.outputDir.emit(self.selectDirectory()))
+        file_btn.clicked.connect(self.selectFile)
+        output_btn.clicked.connect(self.selectDirectory)
 
     def selectFile(self):
         filename, ok = QFileDialog.getOpenFileName(
@@ -53,23 +53,28 @@ class InputPage(Page):
             filter="CSV (*.csv)",
             selectedFilter="",
         )
-        return filename
+        if filename:
+            self.inputFile.emit(filename)
+
+    def selectDirectory(self):
+        dir = QFileDialog.getExistingDirectory()
+        if dir:
+            self.outputDir.emit(dir)
 
     def handleSelectedFile(self, path: str):
         rendered_widget = None
         if not path:
             rendered_widget = QLabel("Select a file to preview")
         elif path.endswith("csv"):
-            rendered_widget = TableRenderer(path)
+            rendered_widget = TableEditor(
+                path, lambda filename: self.inputFile.emit(filename)
+            )
         else:
             rendered_widget = QLabel("Unsupported file type")
 
         if self.rendered_widget is not None:
             self._layout.replaceWidget(self.rendered_widget, rendered_widget)
+            self.rendered_widget.deleteLater()
         else:
             self._layout.addWidget(rendered_widget)
         self.rendered_widget = rendered_widget
-
-    def selectDirectory(self):
-        dir = QFileDialog.getExistingDirectory()
-        return dir

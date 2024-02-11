@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 # Custom UI libraries
 from ui.components.page import Page
 from ui.components.png_renderer import ImageRenderer
-from ui.components.table_renderer import TableRenderer
+from ui.components.table_editor import TableEditor
 
 
 class OutputFilesPage(Page):
@@ -34,7 +34,7 @@ class OutputFilesPage(Page):
         self._layout.addWidget(label)
 
         self.list = QListWidget()
-        self._layout.addWidget(self.list)
+        self._layout.addWidget(self.list, 1) # stretch factor
 
         self.list.itemClicked.connect(
             lambda i: self.selectedFile.emit(i.data(Qt.ItemDataRole.UserRole))
@@ -80,8 +80,8 @@ class OutputFilesPage(Page):
         elif path.endswith("png"):
             self.rendered_widget = ImageRenderer(path)
         elif path.endswith("csv"):
-            self.rendered_widget = TableRenderer(path)
+            self.rendered_widget = TableEditor(path, lambda file: self.updateDirectoryWidgets())
         else:
             self.rendered_widget = QLabel("Unsupported file type")
 
-        self._layout.addWidget(self.rendered_widget)
+        self._layout.addWidget(self.rendered_widget, 2)  # add with stretch factor

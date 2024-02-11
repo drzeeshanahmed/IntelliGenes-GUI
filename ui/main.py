@@ -39,6 +39,8 @@ class MainWindow(QMainWindow):
         
         self.inputFile.emit("")
         self.outputDir.emit("")
+        # Change
+        self.inputFile.emit("/Users/rishabh_n/Research/promis/intelligenes/tests/smaller/dataset.csv")
 
         tab_bar = QTabWidget()
         tab_bar.currentChanged.connect(select_tab)
