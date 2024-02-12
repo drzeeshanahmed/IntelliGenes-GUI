@@ -97,6 +97,12 @@ def select_features(
 ) -> DataFrame:
     id_column = "ID"
     y_label_col = "Type"
+
+    for c in [id_column, y_label_col]:
+        if c not in input_df.columns:
+            stdout.write(f"Invalid format: Missing column '{c}' in CIGT file.")
+            return
+
     parsed_input_df = input_df.drop(columns=[id_column])
     X = parsed_input_df.drop(columns=[y_label_col])
     Y = parsed_input_df[y_label_col]
@@ -159,13 +165,13 @@ def select_features(
     selected_cigt_path = os.path.join(output_dir, f"{stem}_Selected-CIGT-File.csv")
     selected_columns = [id_column, y_label_col]
     selected_columns.extend(selected[features_col].tolist())
-    
+
     selected_df = input_df[selected_columns]
     selected_df.to_csv(selected_cigt_path, index=False)
     stdout.write(f"Saved the selected features CIGT file to {selected_path}")
 
     stdout.write("Finished Feature Selection")
-    
+
     return selected_df
 
 

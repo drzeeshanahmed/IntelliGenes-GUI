@@ -216,6 +216,14 @@ def classify_features(
     output_dir: str,
     stem: str,
 ):
+    id_column = "ID"
+    y_label_col = "Type"
+    
+    for c in [id_column, y_label_col]:
+        if c not in input_df.columns:
+            stdout.write(f"Invalid format: Missing column '{c}' in CIGT file.")
+            return
+
     parsed_input_df = input_df.drop(columns=["ID"])
     X = parsed_input_df.drop(columns=["Type"])
     Y = parsed_input_df["Type"]
