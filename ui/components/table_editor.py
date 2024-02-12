@@ -55,9 +55,9 @@ class TableEditor(QWidget):
 
         # Save/Reset dataframe
         delete_col_row = QVBoxLayout()
-        self.delete_col = QPushButton("Delete Selected Column(s)")
+        self.delete_col = QPushButton("Remove Selected Column(s)")
         self.delete_col.clicked.connect(self.deleteSelectedColumns)
-        self.delete_row = QPushButton("Delete Selected Row(s)")
+        self.delete_row = QPushButton("Remove Selected Row(s)")
         self.delete_row.clicked.connect(self.deleteSelectedRows)
         delete_col_row.addWidget(self.delete_col)
         delete_col_row.addWidget(self.delete_row)

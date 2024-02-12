@@ -9,6 +9,7 @@ from utils.setting import (
     IntSetting,
     FloatSetting,
     StrChoiceSetting,
+    FileSetting,
 )
 from utils.stdout import StdOut
 
@@ -84,6 +85,11 @@ def classification_pipeline() -> PipelineResult:
                     StrChoiceSetting("Voting", "soft", ["soft", "hard"], tooltip=""),
                     BoolSetting("Calculate I-Genes", True, tooltip=""),
                     BoolSetting("Create Visualizations", True, tooltip=""),
+                    FileSetting(
+                        "Selected Features",
+                        "",
+                        tooltip="A file with newline-delimited significant features. \nIf none is provided, then the pipeline will use all provided features",
+                    ),
                 ],
             ),
             Group(
@@ -106,7 +112,8 @@ def classification_pipeline() -> PipelineResult:
     ):
         classification.main(
             stdout=stdout,
-            selected_cgit_file=cgit_file,
+            cgit_file=cgit_file,
+            selected_features_file=config.get("Selected Features"),
             output_dir=output_dir,
             rand_state=config.get("Random State"),
             test_size=config.get("Test Size"),

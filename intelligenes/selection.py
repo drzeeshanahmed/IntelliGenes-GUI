@@ -164,7 +164,8 @@ def select_features(
 
     selected_cigt_path = os.path.join(output_dir, f"{stem}_Selected-CIGT-File.csv")
     selected_columns = [id_column, y_label_col]
-    selected_columns.extend(selected[features_col].tolist())
+    significant_features = selected[features_col].tolist()
+    selected_columns.extend(significant_features)
 
     selected_df = input_df[selected_columns]
     selected_df.to_csv(selected_cigt_path, index=False)
@@ -172,7 +173,7 @@ def select_features(
 
     stdout.write("Finished Feature Selection")
 
-    return selected_df
+    return significant_features
 
 
 def main(

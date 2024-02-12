@@ -38,7 +38,7 @@ def main(
 ):
     stdout.write(f"Reading DataFrame from {cgit_file}")
     input_df = pd.read_csv(cgit_file)
-    selected_df = select_features(
+    significant_features = select_features(
         input_df=input_df,
         rand_state=rand_state,
         test_size=test_size,
@@ -53,7 +53,8 @@ def main(
     )
 
     classify_features(
-        input_df=selected_df,
+        input_df=input_df,
+        selected_features=significant_features,
         rand_state=rand_state,
         test_size=test_size,
         use_normalization=use_normalization_classifiers,

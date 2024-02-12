@@ -1,4 +1,5 @@
 # UI Libraries
+import os
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget,
@@ -10,6 +11,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QGroupBox,
+    QPushButton,
+    QFileDialog,
 )
 
 # System libraries
@@ -200,3 +203,55 @@ class StrChoiceSetting(Setting):
         widget.setToolTip(self.tooltip)
 
         return widget
+
+
+class FileSetting(Setting):
+    def __init__(self, name: str, value: str, tooltip: str):
+        super().__init__(name, value, tooltip)
+
+    def widget(self):
+        widget = QWidget()
+        container_layout = QVBoxLayout()
+        container_layout.setSpacing(0)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        widget.setLayout(container_layout)
+
+        button_layout = QHBoxLayout()
+        path_layout = QHBoxLayout()
+        path_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        pb = QPushButton("Reset" if self.value else "Select File")
+        label = QLabel(
+            os.path.basename(self.value) if self.value else "(No file selected)"
+        )
+        pb.clicked.connect(lambda: self.chooseFile(pb, label))
+
+        button_layout.addWidget(QLabel(self.name))
+        button_layout.addStretch(1)
+        button_layout.addWidget(pb)
+        path_layout.addWidget(label)
+
+        widget.setToolTip(self.tooltip)
+
+        container_layout.addLayout(button_layout)
+        container_layout.addLayout(path_layout)
+
+        return widget
+
+    def chooseFile(self, pb: QPushButton, label: QLabel):
+        if self.value:
+            self.value = ""
+        else:
+            filename, ok = QFileDialog.getOpenFileName(
+                parent=pb,
+                caption="Select a file",
+                dir="",
+                filter="Text (*.csv *.txt)",
+                selectedFilter="",
+            )
+            self.value = filename
+
+        pb.setText("Reset" if self.value else "Select File")
+        label.setText(
+            os.path.basename(self.value) if self.value else "No file selected"
+        )
