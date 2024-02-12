@@ -32,8 +32,7 @@ class Worker:
 
     def run(self):
         try:
-            if self._process:
-                self._process()
+            self._process()
         except Exception as e:
             self._stdout.write(f"Execution of pipeline failed with message: {e}")
             self._stdout.write("Exiting...")

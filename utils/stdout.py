@@ -34,7 +34,7 @@ class StdOut:
     def close(self):
         # Order is important. Closing ostream allows istream to recieve an EOF
         self._ostream.close()
-
+        # NOTE: This almost always works, but rarely may miss the last line or two. Not sure exactly why.
         for line in self._istream.readlines():
             self._reversed_final.append(line)
 
