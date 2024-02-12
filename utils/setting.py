@@ -5,7 +5,6 @@ from PySide6.QtWidgets import (
     QComboBox,
     QSpinBox,
     QDoubleSpinBox,
-    QLineEdit,
     QCheckBox,
     QLabel,
     QVBoxLayout,
@@ -18,9 +17,10 @@ from typing import Any
 
 
 class Setting:
-    def __init__(self, name: str, value):
+    def __init__(self, name: str, value, tooltip: str):
         self.name = name
         self.value = value
+        self.tooltip = tooltip
 
     def set(self, value):
         self.value = value
@@ -31,7 +31,7 @@ class Setting:
 
 class Group(Setting):
     def __init__(self, name: str, settings: list[Setting]):
-        super().__init__(name, None)
+        super().__init__(name, None, "")
         self.settings = settings
 
     def widget(self) -> QWidget:
@@ -76,8 +76,16 @@ class Config:
 
 
 class IntSetting(Setting):
-    def __init__(self, name: str, value: int, min: int, max: int, step: int = 1):
-        super().__init__(name, value)
+    def __init__(
+        self,
+        name: str,
+        value: int,
+        min: int,
+        max: int,
+        step: int,
+        tooltip: str,
+    ):
+        super().__init__(name, value, tooltip)
         self.min = min
         self.max = max
         self.step = step
@@ -100,14 +108,22 @@ class IntSetting(Setting):
         container_layout.addStretch(1)
         container_layout.addWidget(sb)
 
+        widget.setToolTip(self.tooltip)
+
         return widget
 
 
 class FloatSetting(Setting):
     def __init__(
-        self, name: str, value: float, min: float, max: float, step: int = 0.05
+        self,
+        name: str,
+        value: float,
+        min: float,
+        max: float,
+        step: int,
+        tooltip: str,
     ):
-        super().__init__(name, value)
+        super().__init__(name, value, tooltip)
         self.min = min
         self.max = max
         self.step = step
@@ -130,12 +146,14 @@ class FloatSetting(Setting):
         container_layout.addStretch(1)
         container_layout.addWidget(sb)
 
+        widget.setToolTip(self.tooltip)
+
         return widget
 
 
 class BoolSetting(Setting):
-    def __init__(self, name: str, value: bool):
-        super().__init__(name, value)
+    def __init__(self, name: str, value: bool, tooltip: str):
+        super().__init__(name, value, tooltip)
 
     def widget(self):
         widget = QWidget()
@@ -151,32 +169,14 @@ class BoolSetting(Setting):
         container_layout.addStretch(1)
         container_layout.addWidget(cb)
 
-        return widget
-
-
-class StrSetting(Setting):
-    def __init__(self, name: str, value):
-        super().__init__(name, value)
-
-    def widget(self):
-        widget = QWidget()
-        container_layout = QHBoxLayout()
-        container_layout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(container_layout)
-
-        le = QLineEdit("value")
-        le.textChanged.connect(self.set)
-
-        container_layout.addWidget(QLabel(self.name))
-        container_layout.addStretch(1)
-        container_layout.addWidget(le)
+        widget.setToolTip(self.tooltip)
 
         return widget
 
 
 class StrChoiceSetting(Setting):
-    def __init__(self, name: str, value: int, options: list[str]):
-        super().__init__(name, value)
+    def __init__(self, name: str, value: int, options: list[str], tooltip: str):
+        super().__init__(name, value, tooltip)
         self.options = options
 
         if value not in options:
@@ -196,5 +196,7 @@ class StrChoiceSetting(Setting):
         container_layout.addWidget(QLabel(self.name))
         container_layout.addStretch(1)
         container_layout.addWidget(cb)
+
+        widget.setToolTip(self.tooltip)
 
         return widget
