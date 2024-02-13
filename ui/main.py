@@ -27,15 +27,15 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("IntelliGenes")
+        self.setWindowTitle("IntelliGenes V1.1")
 
         layout = QVBoxLayout()
 
         tabs: list[tuple[str, Page]] = [
-            ("Input", InputPage(self.inputFile, self.outputDir, self.inputPageSignal)),
-            ("Pipeline", PipelinePage(self.inputFile, self.outputDir, self.pipelinePageSignal)),
-            ("Files", OutputFilesPage(self.inputFile, self.outputDir, self.filesPageSignal)),
-            ("About", AboutPage(self.inputFile, self.outputDir, self.demoPageSignal)),
+            ("Load Data", InputPage(self.inputFile, self.outputDir, self.inputPageSignal)),
+            ("AI/ML", PipelinePage(self.inputFile, self.outputDir, self.pipelinePageSignal)),
+            ("Outcomes", OutputFilesPage(self.inputFile, self.outputDir, self.filesPageSignal)),
+            ("Help", AboutPage(self.inputFile, self.outputDir, self.demoPageSignal)),
         ]
         def select_tab(index: int):
             tabs[index][1].onTabSelected.emit()
@@ -51,7 +51,6 @@ class MainWindow(QMainWindow):
         for name, widget in tabs:
             tab_bar.addTab(widget, name)
         tab_bar.setCurrentIndex(0)
-        
 
         tab_bar.setLayout(layout)
 

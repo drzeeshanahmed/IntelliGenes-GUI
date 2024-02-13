@@ -40,7 +40,7 @@ class TableEditor(QWidget):
         # Update Cell Content
         edit_cell_layout = QVBoxLayout()
         self.cell_content = QLineEdit()
-        self.save_cell_content = QPushButton("Update Cell(s)")
+        self.save_cell_content = QPushButton("Update")
         self.save_cell_content.clicked.connect(self.editCellContent)
         edit_cell_layout.addWidget(self.cell_content)
         edit_cell_layout.addWidget(self.save_cell_content)
@@ -48,25 +48,25 @@ class TableEditor(QWidget):
         # Rename selected column
         edit_column_name = QVBoxLayout()
         self.column_name = QLineEdit()
-        self.save_column_name = QPushButton("Rename Selected Column")
+        self.save_column_name = QPushButton("Edit")
         self.save_column_name.clicked.connect(self.renameColumn)
         edit_column_name.addWidget(self.column_name)
         edit_column_name.addWidget(self.save_column_name)
 
         # Save/Reset dataframe
         delete_col_row = QVBoxLayout()
-        self.delete_col = QPushButton("Remove Selected Column(s)")
+        self.delete_col = QPushButton("Remove Columns")
         self.delete_col.clicked.connect(self.deleteSelectedColumns)
-        self.delete_row = QPushButton("Remove Selected Row(s)")
+        self.delete_row = QPushButton("Remove Rows")
         self.delete_row.clicked.connect(self.deleteSelectedRows)
         delete_col_row.addWidget(self.delete_col)
         delete_col_row.addWidget(self.delete_row)
 
         # Save/Reset dataframe
         reset_save_layout = QVBoxLayout()
-        reset_button = QPushButton("Reset DataFrame")
+        reset_button = QPushButton("Undo")
         reset_button.clicked.connect(self.resetCSV)
-        save_button = QPushButton("Save DataFrame")
+        save_button = QPushButton("Save")
         save_button.clicked.connect(self.handleSaveDataframe)
         reset_save_layout.addWidget(reset_button)
         reset_save_layout.addWidget(save_button)

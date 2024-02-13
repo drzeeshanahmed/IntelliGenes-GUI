@@ -30,7 +30,7 @@ class OutputFilesPage(Page):
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
 
-        label = QLabel("Select an Output Directory")
+        label = QLabel()
         self._layout.addWidget(label)
 
         self.list = QListWidget()
@@ -42,7 +42,7 @@ class OutputFilesPage(Page):
 
         self.outputDirSignal.connect(self.setOutputPath)
         self.outputDirSignal.connect(
-            lambda text: label.setText(text if text else "Select an Output Directory")
+            lambda text: label.setText(text if text else "Select an Output Location")
         )
         self.onTabSelected.connect(self.updateDirectoryWidgets)
         self.selectedFile.connect(self.handleSelectedFile)

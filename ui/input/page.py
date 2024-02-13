@@ -31,35 +31,33 @@ class InputPage(Page):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(layout)
 
+        reset_button = QPushButton("Reset IntelliGenes")
+        reset_button.clicked.connect(
+            lambda: (self.inputFileSignal.emit(""), self.outputDirSignal.emit(""))
+        )
+        layout.addWidget(reset_button)
+
         input_layout = QHBoxLayout()
         self.content_layout = QVBoxLayout()
         output_layout = QHBoxLayout()
 
-        input_btn = QPushButton()
+        input_btn = QPushButton("Select Input File")
         input_label = QLabel()
         input_layout.addWidget(input_btn)
         input_layout.addWidget(input_label)
         self.inputFileSignal.connect(self.handleSelectedFile)
         self.inputFileSignal.connect(
-            lambda text: (
-                input_label.setText("No file selected" if not text else text),
-                input_btn.setText(
-                    "Select CIGT File" if not text else "Reset CIGT File"
-                ),
-            )
+            lambda text: input_label.setText("No file selected" if not text else text)
         )
 
-        output_btn = QPushButton("Select Directory")
+        output_btn = QPushButton("Select Output Location")
         output_label = QLabel()
         output_layout.addWidget(output_btn)
         output_layout.addWidget(output_label)
         self.outputDirSignal.connect(self.handleSelectedDir)
         self.outputDirSignal.connect(
-            lambda text: (
-                output_label.setText("No directory selected" if not text else text),
-                output_btn.setText(
-                    "Select Directory" if not text else "Reset Directory"
-                ),
+            lambda text: output_label.setText(
+                "No directory selected" if not text else text
             )
         )
 
@@ -71,28 +69,22 @@ class InputPage(Page):
         layout.addLayout(output_layout)
 
     def selectFile(self):
-        if self.file:
-            filename = ""
-        else:
-            filename, ok = QFileDialog.getOpenFileName(
-                parent=self,
-                caption="Select a CSV File",
-                dir="",
-                filter="CSV (*.csv)",
-                selectedFilter="",
-            )
-        
-        self.inputFileSignal.emit(filename)
-        if not self.dir:
+        filename, ok = QFileDialog.getOpenFileName(
+            parent=self,
+            caption="Select a CSV File",
+            dir="",
+            filter="CSV (*.csv)",
+            selectedFilter="",
+        )
+
+        if filename:
+            self.inputFileSignal.emit(filename)
             self.outputDirSignal.emit(os.path.dirname(filename))
 
     def selectDirectory(self):
-        if self.dir:
-            dir = ""
-        else:
-            dir = QFileDialog.getExistingDirectory()
-
-        self.outputDirSignal.emit(dir)
+        dir = QFileDialog.getExistingDirectory()
+        if dir:
+            self.outputDirSignal.emit(dir)
 
     def handleSelectedDir(self, text: str):
         self.dir = text
@@ -101,7 +93,7 @@ class InputPage(Page):
         self.file = path
         rendered_widget = None
         if not path:
-            rendered_widget = QLabel("(Select a CIGT file to preview)")
+            rendered_widget = QLabel("(Select an input file to preview)")
         elif path.endswith("csv"):
             rendered_widget = TableEditor(
                 path, lambda filename: self.inputFileSignal.emit(filename)

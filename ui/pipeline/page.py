@@ -48,7 +48,7 @@ class PipelinePage(Page):
         self.setLayout(layout)
 
         combo_box = QComboBox()
-        run_button = QPushButton("Run")
+        run_button = QPushButton("Process")
 
         for name, _, _ in pipelines:
             combo_box.addItem(name)
@@ -77,9 +77,9 @@ class PipelinePage(Page):
     def run_pipeline(self, pipeline: PipelineResult):
         # validate pipeline
         if not self.inputFilePath:
-            self.stdout.write("Select input CIGT file")
+            self.stdout.write("Select an input file")
         elif not self.outputDirPath:
-            self.stdout.write("Select output directory")
+            self.stdout.write("Select an output location")
         else:
             pipeline[2](self.inputFilePath, self.outputDirPath, self.stdout)
 
