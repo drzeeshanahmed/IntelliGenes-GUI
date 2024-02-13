@@ -1,7 +1,9 @@
 # UI libraries
+import os
 from PySide6.QtCore import SignalInstance, Qt
 from PySide6.QtWidgets import (
     QVBoxLayout,
+    QHBoxLayout,
     QLabel,
     QFileDialog,
     QPushButton,
@@ -22,59 +24,94 @@ class InputPage(Page):
         super().__init__(inputFile, outputDir, onTabSelected)
 
         self.rendered_widget = None
-        self._layout = QVBoxLayout()
-        self._layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.setLayout(self._layout)
+        self.file = ""
+        self.dir = ""
 
-        file_btn = QPushButton()
-        output_btn = QPushButton()
-        self._layout.addWidget(file_btn)
-        self._layout.addWidget(output_btn)
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.setLayout(layout)
 
-        self.inputFile.connect(
-            lambda text: file_btn.setText("Select CIGT File" if not text else text)
-        )
-        self.inputFile.connect(self.handleSelectedFile)
+        input_layout = QHBoxLayout()
+        self.content_layout = QVBoxLayout()
+        output_layout = QHBoxLayout()
 
-        self.outputDir.connect(
-            lambda text: output_btn.setText(
-                "Select Output Directory" if not text else text
+        input_btn = QPushButton()
+        input_label = QLabel()
+        input_layout.addWidget(input_btn)
+        input_layout.addWidget(input_label)
+        self.inputFileSignal.connect(self.handleSelectedFile)
+        self.inputFileSignal.connect(
+            lambda text: (
+                input_label.setText("No file selected" if not text else text),
+                input_btn.setText(
+                    "Select CIGT File" if not text else "Reset CIGT File"
+                ),
             )
         )
 
-        file_btn.clicked.connect(self.selectFile)
+        output_btn = QPushButton("Select Directory")
+        output_label = QLabel()
+        output_layout.addWidget(output_btn)
+        output_layout.addWidget(output_label)
+        self.outputDirSignal.connect(self.handleSelectedDir)
+        self.outputDirSignal.connect(
+            lambda text: (
+                output_label.setText("No directory selected" if not text else text),
+                output_btn.setText(
+                    "Select Directory" if not text else "Reset Directory"
+                ),
+            )
+        )
+
         output_btn.clicked.connect(self.selectDirectory)
+        input_btn.clicked.connect(self.selectFile)
+
+        layout.addLayout(input_layout)
+        layout.addLayout(self.content_layout)
+        layout.addLayout(output_layout)
 
     def selectFile(self):
-        filename, ok = QFileDialog.getOpenFileName(
-            parent=self,
-            caption="Select a CSV File",
-            dir="",
-            filter="CSV (*.csv)",
-            selectedFilter="",
-        )
-        if filename:
-            self.inputFile.emit(filename)
+        if self.file:
+            filename = ""
+        else:
+            filename, ok = QFileDialog.getOpenFileName(
+                parent=self,
+                caption="Select a CSV File",
+                dir="",
+                filter="CSV (*.csv)",
+                selectedFilter="",
+            )
+        
+        self.inputFileSignal.emit(filename)
+        if not self.dir:
+            self.outputDirSignal.emit(os.path.dirname(filename))
 
     def selectDirectory(self):
-        dir = QFileDialog.getExistingDirectory()
-        if dir:
-            self.outputDir.emit(dir)
+        if self.dir:
+            dir = ""
+        else:
+            dir = QFileDialog.getExistingDirectory()
+
+        self.outputDirSignal.emit(dir)
+
+    def handleSelectedDir(self, text: str):
+        self.dir = text
 
     def handleSelectedFile(self, path: str):
+        self.file = path
         rendered_widget = None
         if not path:
-            rendered_widget = QLabel("Select a file to preview")
+            rendered_widget = QLabel("(Select a CIGT file to preview)")
         elif path.endswith("csv"):
             rendered_widget = TableEditor(
-                path, lambda filename: self.inputFile.emit(filename)
+                path, lambda filename: self.inputFileSignal.emit(filename)
             )
         else:
             rendered_widget = QLabel("Unsupported file type")
 
         if self.rendered_widget is not None:
-            self._layout.replaceWidget(self.rendered_widget, rendered_widget)
+            self.content_layout.replaceWidget(self.rendered_widget, rendered_widget)
             self.rendered_widget.deleteLater()
         else:
-            self._layout.addWidget(rendered_widget)
+            self.content_layout.addWidget(rendered_widget)
         self.rendered_widget = rendered_widget

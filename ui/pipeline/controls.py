@@ -31,14 +31,23 @@ class PipelineControls(QWidget):
         self.setLayout(self._layout)
 
         self.widget = None
-        self.update_settings(combo_box.currentIndex())
-        combo_box.currentIndexChanged.connect(self.update_settings)
+        self.update_widgets(combo_box.currentIndex())
+        combo_box.currentIndexChanged.connect(self.update_widgets)
+
+        reset_button = QPushButton("Reset Settings")
+        reset_button.clicked.connect(
+            lambda: (
+                pipelines[combo_box.currentIndex()][1].reset_settings(),
+                self.update_widgets(combo_box.currentIndex()),
+            )
+        )
 
         self._layout.addWidget(combo_box)
         self._layout.addWidget(self.widget)
+        self._layout.addWidget(reset_button)
         self._layout.addWidget(run_button)
 
-    def update_settings(self, index: int):
+    def update_widgets(self, index: int):
         _, config, _ = self.pipelines[index]
         old = self.widget
         self.widget = config.widget()

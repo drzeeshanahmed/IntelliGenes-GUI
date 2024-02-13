@@ -20,13 +20,17 @@ from typing import Any
 
 
 class Setting:
-    def __init__(self, name: str, value, tooltip: str):
+    def __init__(self, name: str, default_value, tooltip: str):
         self.name = name
-        self.value = value
+        self.value = default_value
+        self.default_value = default_value
         self.tooltip = tooltip
 
     def set(self, value):
         self.value = value
+
+    def reset(self):
+        self.value = self.default_value
 
     def widget(self) -> QWidget:
         pass
@@ -77,18 +81,26 @@ class Config:
         widget.setLayout(settings_layout)
         return widget
 
+    def reset_settings(self):
+        for setting in self.settings:
+            if not isinstance(setting, Group):
+                setting.reset()
+            else:
+                for s in setting.settings:
+                    s.reset()
+
 
 class IntSetting(Setting):
     def __init__(
         self,
         name: str,
-        value: int,
+        default_value: int,
         min: int,
         max: int,
         step: int,
         tooltip: str,
     ):
-        super().__init__(name, value, tooltip)
+        super().__init__(name, default_value, tooltip)
         self.min = min
         self.max = max
         self.step = step
@@ -120,13 +132,13 @@ class FloatSetting(Setting):
     def __init__(
         self,
         name: str,
-        value: float,
+        default_value: float,
         min: float,
         max: float,
         step: int,
         tooltip: str,
     ):
-        super().__init__(name, value, tooltip)
+        super().__init__(name, default_value, tooltip)
         self.min = min
         self.max = max
         self.step = step
@@ -155,8 +167,8 @@ class FloatSetting(Setting):
 
 
 class BoolSetting(Setting):
-    def __init__(self, name: str, value: bool, tooltip: str):
-        super().__init__(name, value, tooltip)
+    def __init__(self, name: str, default_value: bool, tooltip: str):
+        super().__init__(name, default_value, tooltip)
 
     def widget(self):
         widget = QWidget()
@@ -178,12 +190,9 @@ class BoolSetting(Setting):
 
 
 class StrChoiceSetting(Setting):
-    def __init__(self, name: str, value: int, options: list[str], tooltip: str):
-        super().__init__(name, value, tooltip)
+    def __init__(self, name: str, default_value: int, options: list[str], tooltip: str):
+        super().__init__(name, default_value, tooltip)
         self.options = options
-
-        if value not in options:
-            raise ValueError("Value not in provided options")
 
     def widget(self):
         widget = QWidget()
@@ -206,8 +215,8 @@ class StrChoiceSetting(Setting):
 
 
 class FileSetting(Setting):
-    def __init__(self, name: str, value: str, tooltip: str):
-        super().__init__(name, value, tooltip)
+    def __init__(self, name: str, default_value: str, tooltip: str):
+        super().__init__(name, default_value, tooltip)
 
     def widget(self):
         widget = QWidget()

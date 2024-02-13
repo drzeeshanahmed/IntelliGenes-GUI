@@ -40,8 +40,8 @@ class OutputFilesPage(Page):
             lambda i: self.selectedFile.emit(i.data(Qt.ItemDataRole.UserRole))
         )
 
-        self.outputDir.connect(self.setOutputPath)
-        self.outputDir.connect(
+        self.outputDirSignal.connect(self.setOutputPath)
+        self.outputDirSignal.connect(
             lambda text: label.setText(text if text else "Select an Output Directory")
         )
         self.onTabSelected.connect(self.updateDirectoryWidgets)
@@ -53,7 +53,7 @@ class OutputFilesPage(Page):
     def browseDirectory(self):
         dir = QFileDialog.getExistingDirectory()
         if dir:
-            self.outputDir.emit(dir)
+            self.outputDirSignal.emit(dir)
 
     def updateDirectoryWidgets(self):
         self.list.clear()

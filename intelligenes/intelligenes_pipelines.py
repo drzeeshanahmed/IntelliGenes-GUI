@@ -16,7 +16,7 @@ from utils.stdout import StdOut
 # IntelliGenes pipelines
 from . import selection, classification, intelligenes
 
-# Custom type alias
+# (name, config, (input, output, stdout) -> None)
 PipelineResult: TypeAlias = tuple[str, Config, Callable[[str, str, StdOut], None]]
 
 

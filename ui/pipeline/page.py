@@ -35,8 +35,8 @@ class PipelinePage(Page):
         self.inputFilePath = None
         self.outputDirPath = None
 
-        self.inputFile.connect(self._setFile)
-        self.outputDir.connect(self._setDir)
+        self.inputFileSignal.connect(self._setFile)
+        self.outputDirSignal.connect(self._setDir)
 
         pipelines: list[PipelineResult] = [
             select_and_classify_pipeline(),

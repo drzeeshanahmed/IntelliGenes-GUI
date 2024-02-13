@@ -11,6 +11,6 @@ class Page(QWidget):
         onTabSelected: SignalInstance,
     ):
         super().__init__()
-        self.inputFile = inputFile
-        self.outputDir = outputDir
+        self.inputFileSignal = inputFile
+        self.outputDirSignal = outputDir
         self.onTabSelected = onTabSelected

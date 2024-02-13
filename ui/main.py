@@ -62,6 +62,8 @@ def run():
     app = QApplication([])
 
     window = MainWindow()
+    # resize to 80% of the available screen
+    window.resize(app.primaryScreen().availableGeometry().size() * 0.8)
     window.show()
 
     sys.exit(app.exec())
