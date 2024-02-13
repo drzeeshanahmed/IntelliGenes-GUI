@@ -59,6 +59,7 @@ class OutputFilesPage(Page):
         self.list.clear()
 
         if not self.path:
+            self.selectedFile.emit("")
             return
 
         dir = QDir(self.path)
@@ -77,11 +78,13 @@ class OutputFilesPage(Page):
 
         if not path:
             self.rendered_widget = QLabel("Select a file to preview")
-        elif path.endswith("png"):
-            self.rendered_widget = ImageRenderer(path)
-        elif path.endswith("csv"):
-            self.rendered_widget = TableEditor(path, lambda file: self.updateDirectoryWidgets())
+            self._layout.addWidget(self.rendered_widget)
         else:
-            self.rendered_widget = QLabel("Unsupported file type")
+            if path.endswith("png"):
+                self.rendered_widget = ImageRenderer(path)
+            elif path.endswith("csv"):
+                self.rendered_widget = TableEditor(path, lambda file: self.updateDirectoryWidgets())
+            else:
+                self.rendered_widget = QLabel("Unsupported file type")
+            self._layout.addWidget(self.rendered_widget, 2)  # add with stretch factor
 
-        self._layout.addWidget(self.rendered_widget, 2)  # add with stretch factor
