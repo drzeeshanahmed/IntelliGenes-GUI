@@ -261,6 +261,4 @@ class FileSetting(Setting):
             self.value = filename
 
         pb.setText("Reset" if self.value else "Select File")
-        label.setText(
-            os.path.basename(self.value) if self.value else "No file selected"
-        )
+        label.setText(self.value if self.value else "(No file selected)")
