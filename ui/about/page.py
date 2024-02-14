@@ -18,11 +18,20 @@ class AboutPage(Page):
         self._layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self._layout)
 
-        self._layout.addWidget(QLabel("About IntelliGenes Desktop"))
-        self._layout.addWidget(
-            QLabel(
+        label =  QLabel(
                 """
-To learn more, you can visit the GitHub page (https://github.com/drzeeshanahmed/IntelliGenes_Desktop).
+To learn more about IntelliGenes Desktop, you can visit the GitHub page (https://github.com/drzeeshanahmed/IntelliGenes_Desktop).
+
+
+Authors:
+
+Dr. Zeeshan Ahmed
+Rishabh Narayanan
+William DeGroat
+Dinesh Mendhe
+Habiba Abdelhalim
 """
             )
-        )
+
+        self._layout.addWidget(label)
+        label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)

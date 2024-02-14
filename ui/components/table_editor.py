@@ -40,7 +40,7 @@ class TableEditor(QWidget):
         # Update Cell Content
         edit_cell_layout = QVBoxLayout()
         self.cell_content = QLineEdit()
-        self.save_cell_content = QPushButton("Update")
+        self.save_cell_content = QPushButton("Update Cells")
         self.save_cell_content.clicked.connect(self.editCellContent)
         edit_cell_layout.addWidget(self.cell_content)
         edit_cell_layout.addWidget(self.save_cell_content)
@@ -48,7 +48,7 @@ class TableEditor(QWidget):
         # Rename selected column
         edit_column_name = QVBoxLayout()
         self.column_name = QLineEdit()
-        self.save_column_name = QPushButton("Edit")
+        self.save_column_name = QPushButton("Rename Column")
         self.save_column_name.clicked.connect(self.renameColumn)
         edit_column_name.addWidget(self.column_name)
         edit_column_name.addWidget(self.save_column_name)
@@ -64,7 +64,7 @@ class TableEditor(QWidget):
 
         # Save/Reset dataframe
         reset_save_layout = QVBoxLayout()
-        reset_button = QPushButton("Undo")
+        reset_button = QPushButton("Reset")
         reset_button.clicked.connect(self.resetCSV)
         save_button = QPushButton("Save")
         save_button.clicked.connect(self.handleSaveDataframe)

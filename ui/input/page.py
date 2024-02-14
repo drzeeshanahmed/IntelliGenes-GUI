@@ -31,11 +31,10 @@ class InputPage(Page):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(layout)
 
-        reset_button = QPushButton("Reset IntelliGenes")
-        reset_button.clicked.connect(
+        self.restart_button = QPushButton("Restart IntelliGenes")
+        self.restart_button.clicked.connect(
             lambda: (self.inputFileSignal.emit(""), self.outputDirSignal.emit(""))
         )
-        layout.addWidget(reset_button)
 
         input_layout = QHBoxLayout()
         self.content_layout = QVBoxLayout()
@@ -49,7 +48,6 @@ class InputPage(Page):
         self.inputFileSignal.connect(
             lambda text: input_label.setText("No file selected" if not text else text)
         )
-
         output_btn = QPushButton("Select Output Location")
         output_label = QLabel()
         output_layout.addWidget(output_btn)
@@ -67,6 +65,7 @@ class InputPage(Page):
         layout.addLayout(input_layout)
         layout.addLayout(self.content_layout)
         layout.addLayout(output_layout)
+        layout.addWidget(self.restart_button)
 
     def selectFile(self):
         filename, ok = QFileDialog.getOpenFileName(
@@ -88,6 +87,7 @@ class InputPage(Page):
 
     def handleSelectedDir(self, text: str):
         self.dir = text
+        self.handleRestartButtonVisibility()
 
     def handleSelectedFile(self, path: str):
         self.file = path
@@ -107,3 +107,10 @@ class InputPage(Page):
         else:
             self.content_layout.addWidget(rendered_widget)
         self.rendered_widget = rendered_widget
+        self.handleRestartButtonVisibility()
+    
+    def handleRestartButtonVisibility(self):
+        if self.dir or self.file:
+            self.restart_button.setVisible(True)
+        else:
+            self.restart_button.setVisible(False)
