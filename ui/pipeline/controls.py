@@ -7,17 +7,13 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 
-# Miscellaneous system libraries
-from typing import Callable
-
-# Custom utilities
-from utils.setting import Config
-
+# Pipeline types
+from intelligenes.intelligenes_pipelines import PipelineResult
 
 class PipelineControls(QWidget):
     def __init__(
         self,
-        pipelines: list[tuple[str, Config, Callable[[], None]]],
+        pipelines: list[PipelineResult],
         run_button: QPushButton,
         combo_box: QComboBox,
     ) -> None:
@@ -31,14 +27,14 @@ class PipelineControls(QWidget):
         self.setLayout(self._layout)
 
         self.widget = None
-        self.update_widgets(combo_box.currentIndex())
-        combo_box.currentIndexChanged.connect(self.update_widgets)
+        self.setIndex(combo_box.currentIndex())
+        combo_box.currentIndexChanged.connect(self.setIndex)
 
         reset_button = QPushButton("Reset Settings")
         reset_button.clicked.connect(
             lambda: (
                 pipelines[combo_box.currentIndex()][1].reset_settings(),
-                self.update_widgets(combo_box.currentIndex()),
+                self.setIndex(combo_box.currentIndex()),
             )
         )
 
@@ -47,7 +43,7 @@ class PipelineControls(QWidget):
         self._layout.addWidget(reset_button)
         self._layout.addWidget(run_button)
 
-    def update_widgets(self, index: int):
+    def setIndex(self, index: int):
         _, config, _ = self.pipelines[index]
         old = self.widget
         self.widget = config.widget()

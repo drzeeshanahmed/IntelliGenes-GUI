@@ -35,28 +35,31 @@ class PipelinePage(Page):
         self.inputFilePath = None
         self.outputDirPath = None
 
-        self.inputFileSignal.connect(self._setFile)
-        self.outputDirSignal.connect(self._setDir)
-
         pipelines: list[PipelineResult] = [
             select_and_classify_pipeline(),
             feature_selection_pipeline(),
             classification_pipeline(),
         ]
 
+        self.inputFileSignal.connect(
+            lambda text: (self._setFile(text), self.reset(pipelines))
+        )
+        self.outputDirSignal.connect(
+            lambda text: (self._setDir(text), self.reset(pipelines))
+        )
+
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        combo_box = QComboBox()
+        self.combo_box = QComboBox()
         run_button = QPushButton("Process")
 
         for name, _, _ in pipelines:
-            combo_box.addItem(name)
-        combo_box.setCurrentIndex(0)
+            self.combo_box.addItem(name)
 
         console = PipelineConsole()
 
-        self.output.textChanged.connect(console.setText)
+        self.output.text.connect(console.setText)
         self.output.started.connect(lambda: run_button.setDisabled(True))
         self.output.finished.connect(lambda: run_button.setDisabled(False))
 
@@ -64,12 +67,12 @@ class PipelinePage(Page):
             # The callback is necessary to re-emit the output directory after the process is done
             # This allows any slots listening to the signal to update with the contents of the directory
             # after it is finished
-            lambda: self.run(pipelines[combo_box.currentIndex()])
+            lambda: self.run(pipelines[self.combo_box.currentIndex()])
         )
 
-        controls = PipelineControls(pipelines, run_button, combo_box)
+        self.controls = PipelineControls(pipelines, run_button, self.combo_box)
 
-        layout.addWidget(controls)
+        layout.addWidget(self.controls)
         layout.setStretch(0, 1)
         layout.addWidget(console)
         layout.setStretch(1, 2)
@@ -94,3 +97,10 @@ class PipelinePage(Page):
 
     def _setDir(self, text: str):
         self.outputDirPath = text
+
+    def reset(self, pipelines: list[PipelineResult]):
+        self.output.text.emit("")
+        for _, config, _ in pipelines:
+            config.reset_settings()
+        self.combo_box.setCurrentIndex(0)
+        self.controls.setIndex(0)

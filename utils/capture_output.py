@@ -48,7 +48,7 @@ class Worker:
 
 
 class CaptureOutput(QThread):
-    textChanged = Signal(str)
+    text = Signal(str)
 
     def __init__(self, stdout: StdOut):
         super().__init__()
@@ -68,4 +68,4 @@ class CaptureOutput(QThread):
             line = self._stdout.read()
             if line is not None:
                 self._text += line
-                self.textChanged.emit(self._text)
+                self.text.emit(self._text)
