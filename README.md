@@ -16,7 +16,7 @@ source venv/bin/activate
 
 ### 2. Install Dependencies
 ```bash
-pip install .
+pip install requirements.txt
 ```
 
 ### 3. Bundle script

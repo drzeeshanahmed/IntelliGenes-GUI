@@ -52,7 +52,7 @@ class PipelinePage(Page):
         self.setLayout(layout)
 
         self.combo_box = QComboBox()
-        run_button = QPushButton("Process")
+        run_button = QPushButton("Execute Analysis")
 
         for name, _, _ in pipelines:
             self.combo_box.addItem(name)
@@ -64,9 +64,6 @@ class PipelinePage(Page):
         self.output.finished.connect(lambda: run_button.setDisabled(False))
 
         run_button.clicked.connect(
-            # The callback is necessary to re-emit the output directory after the process is done
-            # This allows any slots listening to the signal to update with the contents of the directory
-            # after it is finished
             lambda: self.run(pipelines[self.combo_box.currentIndex()])
         )
 

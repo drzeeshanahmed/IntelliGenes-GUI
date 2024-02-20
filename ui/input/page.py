@@ -31,7 +31,7 @@ class InputPage(Page):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(layout)
 
-        self.restart_button = QPushButton("Restart IntelliGenes")
+        self.restart_button = QPushButton("Reset IntelliGenes")
         self.restart_button.clicked.connect(
             lambda: (self.inputFileSignal.emit(""), self.outputDirSignal.emit(""))
         )

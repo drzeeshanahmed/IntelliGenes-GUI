@@ -20,11 +20,10 @@ from typing import Any
 
 
 class Setting:
-    def __init__(self, name: str, default_value, tooltip: str):
+    def __init__(self, name: str, default_value):
         self.name = name
         self.value = default_value
         self.default_value = default_value
-        self.tooltip = tooltip
 
     def set(self, value):
         self.value = value
@@ -38,7 +37,7 @@ class Setting:
 
 class Group(Setting):
     def __init__(self, name: str, settings: list[Setting]):
-        super().__init__(name, None, "")
+        super().__init__(name, None)
         self.settings = settings
 
     def widget(self) -> QWidget:
@@ -91,16 +90,8 @@ class Config:
 
 
 class IntSetting(Setting):
-    def __init__(
-        self,
-        name: str,
-        default_value: int,
-        min: int,
-        max: int,
-        step: int,
-        tooltip: str,
-    ):
-        super().__init__(name, default_value, tooltip)
+    def __init__(self, name: str, default_value: int, min: int, max: int, step: int):
+        super().__init__(name, default_value)
         self.min = min
         self.max = max
         self.step = step
@@ -123,22 +114,14 @@ class IntSetting(Setting):
         container_layout.addStretch(1)
         container_layout.addWidget(sb)
 
-        widget.setToolTip(self.tooltip)
-
         return widget
 
 
 class FloatSetting(Setting):
     def __init__(
-        self,
-        name: str,
-        default_value: float,
-        min: float,
-        max: float,
-        step: int,
-        tooltip: str,
+        self, name: str, default_value: float, min: float, max: float, step: int
     ):
-        super().__init__(name, default_value, tooltip)
+        super().__init__(name, default_value)
         self.min = min
         self.max = max
         self.step = step
@@ -161,14 +144,12 @@ class FloatSetting(Setting):
         container_layout.addStretch(1)
         container_layout.addWidget(sb)
 
-        widget.setToolTip(self.tooltip)
-
         return widget
 
 
 class BoolSetting(Setting):
-    def __init__(self, name: str, default_value: bool, tooltip: str):
-        super().__init__(name, default_value, tooltip)
+    def __init__(self, name: str, default_value: bool):
+        super().__init__(name, default_value)
 
     def widget(self):
         widget = QWidget()
@@ -184,14 +165,12 @@ class BoolSetting(Setting):
         container_layout.addStretch(1)
         container_layout.addWidget(cb)
 
-        widget.setToolTip(self.tooltip)
-
         return widget
 
 
 class StrChoiceSetting(Setting):
-    def __init__(self, name: str, default_value: int, options: list[str], tooltip: str):
-        super().__init__(name, default_value, tooltip)
+    def __init__(self, name: str, default_value: int, options: list[str]):
+        super().__init__(name, default_value)
         self.options = options
 
     def widget(self):
@@ -209,14 +188,12 @@ class StrChoiceSetting(Setting):
         container_layout.addStretch(1)
         container_layout.addWidget(cb)
 
-        widget.setToolTip(self.tooltip)
-
         return widget
 
 
 class FileSetting(Setting):
-    def __init__(self, name: str, default_value: str, tooltip: str):
-        super().__init__(name, default_value, tooltip)
+    def __init__(self, name: str, default_value: str):
+        super().__init__(name, default_value)
 
     def widget(self):
         widget = QWidget()
@@ -239,8 +216,6 @@ class FileSetting(Setting):
         button_layout.addStretch(1)
         button_layout.addWidget(pb)
         path_layout.addWidget(label)
-
-        widget.setToolTip(self.tooltip)
 
         container_layout.addLayout(button_layout)
         container_layout.addLayout(path_layout)

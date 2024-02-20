@@ -30,7 +30,7 @@ class PipelineControls(QWidget):
         self.setIndex(combo_box.currentIndex())
         combo_box.currentIndexChanged.connect(self.setIndex)
 
-        reset_button = QPushButton("Reset Settings")
+        reset_button = QPushButton("Reset AI/ML Parameters")
         reset_button.clicked.connect(
             lambda: (
                 pipelines[combo_box.currentIndex()][1].reset_settings(),
@@ -40,8 +40,8 @@ class PipelineControls(QWidget):
 
         self._layout.addWidget(combo_box)
         self._layout.addWidget(self.widget)
-        self._layout.addWidget(reset_button)
         self._layout.addWidget(run_button)
+        self._layout.addWidget(reset_button)
 
     def setIndex(self, index: int):
         _, config, _ = self.pipelines[index]

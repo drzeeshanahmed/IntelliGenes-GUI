@@ -30,8 +30,10 @@ class OutputFilesPage(Page):
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
 
-        label = QLabel()
+        label = QLabel("Output Location (Generated CSV and PNG files):")
         self._layout.addWidget(label)
+        path_label = QLabel()
+        self._layout.addWidget(path_label)
 
         self.list = QListWidget()
         self._layout.addWidget(self.list, 1) # stretch factor
@@ -42,7 +44,7 @@ class OutputFilesPage(Page):
 
         self.outputDirSignal.connect(self.setOutputPath)
         self.outputDirSignal.connect(
-            lambda text: label.setText(text if text else "Select an Output Location")
+            lambda text: path_label.setText(text if text else "Select an Output Location")
         )
         self.onTabSelected.connect(self.updateDirectoryWidgets)
         self.selectedFile.connect(self.handleSelectedFile)
