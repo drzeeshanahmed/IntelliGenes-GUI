@@ -1,4 +1,5 @@
 # UI libraries
+import os
 from PySide6.QtCore import QDir, Signal, Qt, SignalInstance
 from PySide6.QtWidgets import (
     QVBoxLayout,
@@ -80,6 +81,9 @@ class OutputFilesPage(Page):
 
         if not path:
             self.rendered_widget = QLabel("Select a file to preview")
+            self._layout.addWidget(self.rendered_widget)
+        elif not os.path.exists(path):
+            self.rendered_widget = QLabel("File not found")
             self._layout.addWidget(self.rendered_widget)
         else:
             if path.endswith("png"):
