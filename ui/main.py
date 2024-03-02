@@ -10,7 +10,7 @@ from ui.components.page import Page
 from .input.page import InputPage
 from .files.page import OutputFilesPage
 from .pipeline.page import PipelinePage
-from .about.page import AboutPage
+from .help.page import HelpPage
 
 
 class MainWindow(QMainWindow):
@@ -27,15 +27,15 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("IntelliGenes V1.1")
+        self.setWindowTitle("IntelliGenes 2")
 
         layout = QVBoxLayout()
 
         tabs: list[tuple[str, Page]] = [
-            ("Load Data", InputPage(self.inputFile, self.outputDir, self.inputPageSignal)),
-            ("AI/ML", PipelinePage(self.inputFile, self.outputDir, self.pipelinePageSignal)),
-            ("Outcomes", OutputFilesPage(self.inputFile, self.outputDir, self.filesPageSignal)),
-            ("Help", AboutPage(self.inputFile, self.outputDir, self.demoPageSignal)),
+            ("Data Manager", InputPage(self.inputFile, self.outputDir, self.inputPageSignal)),
+            ("AI/ML Analyzer", PipelinePage(self.inputFile, self.outputDir, self.pipelinePageSignal)),
+            ("Visualizations", OutputFilesPage(self.inputFile, self.outputDir, self.filesPageSignal)),
+            ("Help", HelpPage(self.inputFile, self.outputDir, self.demoPageSignal)),
         ]
         def select_tab(index: int):
             tabs[index][1].onTabSelected.emit()

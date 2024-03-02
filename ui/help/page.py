@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QVBoxLayout, QLabel
 from ui.components.page import Page
 
 
-class AboutPage(Page):
+class HelpPage(Page):
     def __init__(
         self,
         inputFile: SignalInstance,
@@ -24,12 +24,13 @@ To learn more about IntelliGenes Desktop, you can visit the GitHub page (https:/
 
 
 Authors:
-
-Dr. Zeeshan Ahmed
 Rishabh Narayanan
 William DeGroat
 Dinesh Mendhe
 Habiba Abdelhalim
+
+Research Supervisor:
+Dr. Zeeshan Ahmed
 """
             )
 
