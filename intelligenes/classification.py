@@ -299,6 +299,7 @@ def classify_features(
 
     stdout.write("Calculating metrics: Accuracy, ROC-AUC, and F1 scores")
     metrics = None
+    predictions: DataFrame = input_df.loc[:, [id_column, y_label_col]].iloc[x_t.index, :]
     for name, classifier in zip(names, classifiers):
         y_pred = classifier.predict(x_t)
         # first column = probablity of class being 0, second column = proba of being 1
@@ -314,10 +315,16 @@ def classify_features(
             ]
         )
         metrics = df if metrics is None else pd.concat([metrics, df], ignore_index=True)
+        pred_df = Series(y_pred, name=name, index=x_t.index)
+        predictions = pd.concat([predictions, pred_df], axis=1)
 
     metrics_path = os.path.join(output_dir, f"{stem}_Classifier-Metrics.csv")
     metrics.to_csv(metrics_path, index=False)
     stdout.write(f"Saved classifier metrics to {metrics_path}")
+
+    prediction_path = os.path.join(output_dir, f"{stem}_Classifier-Predictions.csv")
+    predictions.to_csv(prediction_path, index=False)
+    stdout.write(f"Saved classifier predictions to {prediction_path}")
 
     if use_igenes:
         stdout.write("Calculating I-Genes score")
