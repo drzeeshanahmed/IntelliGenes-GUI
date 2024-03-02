@@ -33,8 +33,8 @@ class MainWindow(QMainWindow):
 
         tabs: list[tuple[str, Page]] = [
             ("Data Manager", InputPage(self.inputFile, self.outputDir, self.inputPageSignal)),
-            ("AI/ML Analyzer", PipelinePage(self.inputFile, self.outputDir, self.pipelinePageSignal)),
-            ("Visualizations", OutputFilesPage(self.inputFile, self.outputDir, self.filesPageSignal)),
+            ("AI/ML Analysis", PipelinePage(self.inputFile, self.outputDir, self.pipelinePageSignal)),
+            ("Visualization", OutputFilesPage(self.inputFile, self.outputDir, self.filesPageSignal)),
             ("Help", HelpPage(self.inputFile, self.outputDir, self.demoPageSignal)),
         ]
         def select_tab(index: int):
