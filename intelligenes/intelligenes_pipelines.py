@@ -9,7 +9,7 @@ from utils.setting import (
     IntSetting,
     FloatSetting,
     StrChoiceSetting,
-    FileSetting,
+    TextFileSetting,
 )
 from utils.stdout import StdOut
 
@@ -78,7 +78,7 @@ def classification_pipeline() -> PipelineResult:
                     StrChoiceSetting("Voting", "soft", ["soft", "hard"]),
                     BoolSetting("Calculate I-Genes", True),
                     BoolSetting("Create Visualizations", True),
-                    FileSetting("Selected Features", ""),
+                    TextFileSetting("Selected Features", ""),
                 ],
             ),
             Group(

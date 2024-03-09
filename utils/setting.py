@@ -191,7 +191,7 @@ class StrChoiceSetting(Setting):
         return widget
 
 
-class FileSetting(Setting):
+class TextFileSetting(Setting):
     def __init__(self, name: str, default_value: str):
         super().__init__(name, default_value)
 
@@ -230,7 +230,7 @@ class FileSetting(Setting):
                 parent=pb,
                 caption="Select a file",
                 dir="",
-                filter="Text (*.csv *.txt)",
+                filter="Text (*.txt)",
                 selectedFilter="",
             )
             self.value = filename
