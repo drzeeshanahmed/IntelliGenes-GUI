@@ -86,7 +86,7 @@ def select_features(
     use_chi2: bool,
     use_pearson: bool,
     output_dir: str,
-    rfe_min_percentile: float,
+    rfe_top_percentile: float,
     pearson_alpha: float,
     anova_alpha: float,
     chi2_alpha: float,
@@ -123,9 +123,9 @@ def select_features(
     results: tuple[list[DataFrame], list[Series]] = []
 
     if use_rfe:
-        stdout.write(f"Recursive Feature Elimination with minimum percentile {rfe_min_percentile}")
+        stdout.write(f"Recursive Feature Elimination with top percentile {rfe_top_percentile}")
         result = recursive_elim(x, y, rand_state, features_col, rfe_col)
-        results.append((result, result[rfe_col] <= int(len(x.columns) * (1 - rfe_min_percentile))))  # 0.9 --> top 10%
+        results.append((result, result[rfe_col] <= int(len(x.columns) * rfe_top_percentile)))
     if use_anova:
         stdout.write(f"Analysis of Variance with significance threshold {anova_alpha}")
         result = anova(x, y, features_col, anova_col)
@@ -184,7 +184,7 @@ def main(
     use_pearson: bool,
     use_anova: bool,
     use_chi2: bool,
-    rfe_min_percentile: float,
+    rfe_top_percentile: float,
     pearson_alpha: float,
     anova_alpha: float,
     chi2_alpha: float,
@@ -203,7 +203,7 @@ def main(
         use_anova=use_anova,
         use_chi2=use_chi2,
         output_dir=output_dir,
-        rfe_min_percentile=rfe_min_percentile,
+        rfe_top_percentile=rfe_top_percentile,
         pearson_alpha=pearson_alpha,
         anova_alpha=anova_alpha,
         chi2_alpha=chi2_alpha,
