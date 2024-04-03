@@ -11,8 +11,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
-
 import seaborn as sns
+from pysankey import sankey
 
 
 # Machine Learning Libraries
@@ -320,7 +320,9 @@ def classify_features(
     classifiers.append(voting)
 
     metrics = None
-    predictions: DataFrame = input_df.loc[:, [id_column, y_label_col]].iloc[x_t.index, :]
+    predictions: list[Series] = []
+    # keep original id column and y column for testing data
+    pred_df: DataFrame = input_df.loc[:, [id_column, y_label_col]].iloc[x_t.index, :]
     for name, classifier in zip(names, classifiers):
         stdout.write(f"Calculating Accuracy, ROC-AUC, and F1 scores for {name}")
         y_pred = classifier.predict(x_t)
@@ -339,8 +341,7 @@ def classify_features(
         roc_scores.append(roc_curve(y_t, y_prob))
 
         metrics = df if metrics is None else pd.concat([metrics, df], ignore_index=True)
-        pred_df = Series(y_pred, name=name, index=x_t.index)
-        predictions = pd.concat([predictions, pred_df], axis=1)
+        predictions.append(Series(y_pred, name=name, index=x_t.index))
 
         stdout.write(f"Calculating confusion matrix for {name}")
         confusion_df = pd.DataFrame(confusion_matrix(y_t, y_pred))  # size = labels x labels (2 x 2 for case/control)
@@ -353,8 +354,9 @@ def classify_features(
     metrics.to_csv(metrics_path, index=False)
     stdout.write(f"Saved classifier metrics to {metrics_path}")
 
+    pred_df = pd.concat([pred_df, *predictions])
     prediction_path = os.path.join(output_dir, f"{stem}_Classifier-Predictions.csv")
-    predictions.to_csv(prediction_path, index=False)
+    pred_df.to_csv(prediction_path, index=False)
     stdout.write(f"Saved classifier predictions to {prediction_path}")
 
     if use_igenes:
@@ -460,6 +462,23 @@ def classify_features(
             set_ax_labels(ax, title=f"{name} ROC", x="False Positive Rate", y="True Positive Rate")
             save_fig(fig, os.path.join(output_dir, f"{stem}_ROC-Curve-{name.replace(' ', '-')}.png"))
 
+        for name, pred in zip(names, predictions):
+            stdout.write(f"Diagnosis accuracy Sankey Chart for {name}")
+            diagnosis_labels = [0, 1]
+            ax_l = sankey(left=y_t, right=pred, leftLabels=diagnosis_labels, rightLabels=diagnosis_labels)
+            ax_l.axis("on")
+            ax_r = ax_l.twinx()
+            for spine in ax_l.spines:
+                ax_l.spines[spine].set_visible(False)
+                ax_r.spines[spine].set_visible(False)
+            ax_l.set_xticks([])
+            ax_r.set_xticks([])
+            ax_l.set_yticks([])
+            ax_r.set_yticks([])
+            set_ax_labels(ax_l, title=f"{name} Sankey Plot", y="True Class")
+            set_ax_labels(ax_r, y="Predicted Class")
+            save_fig(ax_l.figure, os.path.join(output_dir, f"{stem}_Sankey-Prediction-Plot-{name.replace(' ', '-')}.png"))
+
         # if use_rf and rf:
         #     stdout.write("Tree graph for Random Forest estimator")
         #     fig, _ = plt.subplots(nrows=1, ncols=1, figsize=(4, 4), dpi=800)
@@ -468,7 +487,7 @@ def classify_features(
         #     save_fig(fig, os.path.join(output_dir, f"{stem}_RF-Estimator-Graph.png"))
 
         stdout.write("Box plot for feature distributions")
-        # may print invalid values if the value is 0 (since 0 is undefined on a log scale)
+        # may print invalid values if the value is 0 (since 0 is undefined on a log scale). can ignore
         fig = sns.catplot(data=melted_df, hue=y_label_col, y="Feature", x="Value", kind="box", aspect=2, log_scale=True)
         fig.figure.set_size_inches(7, 2 + num_selected_features * 0.5)
         set_fig_labels(fig.figure, title="Feature Distribution")

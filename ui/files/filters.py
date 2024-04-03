@@ -18,11 +18,12 @@ class FiltersWidget(QWidget):
                 r".*Collapsed-Feature-Values\.csv",
                 r".*Feature-Correlations\.csv",
             ],
-            "Confusion Matrices": [r".*Confusion-Heatmap.*\.png", r".*Confusion-Matrix.*\.csv"],
-            "SHAP Scores": [r".*SHAP-Plot.*\.png", r".*SHAP-Scores.*\.csv"],
-            "Selector Metrics": [r".*All-Features\.csv", r".*Selected-Features\.csv", r".*Selected-CIGT-File\.csv"],
             "Classifier Metrics": [r".*Classifier-Metrics\.csv", r".*Classifier-Predictions\.csv", r".*I-Genes-Score\.csv"],
+            "Selector Metrics": [r".*All-Features\.csv", r".*Selected-Features\.csv", r".*Selected-CIGT-File\.csv"],
+            "Confusion Matrices": [r".*Confusion-Heatmap.*\.png", r".*Confusion-Matrix.*\.csv"],
             "ROC Curves": [r".*ROC-Curve.*\.png"],
+            "Sankey Plots": [r".*Sankey-Prediction-Plot.*\.png", r".*Classifier-Predictions\.csv"],
+            "SHAP Scores": [r".*SHAP-Plot.*\.png", r".*SHAP-Scores.*\.csv"],
         }
         self.widgets = {k: QCheckBox(k) for k in self.regex.keys()}
 
