@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 import seaborn as sns
-from pysankey import sankey
+# from pysankey import sankey
 
 
 # Machine Learning Libraries
@@ -462,22 +462,22 @@ def classify_features(
             set_ax_labels(ax, title=f"{name} ROC", x="False Positive Rate", y="True Positive Rate")
             save_fig(fig, os.path.join(output_dir, f"{stem}_ROC-Curve-{name.replace(' ', '-')}.png"))
 
-        for name, pred in zip(names, predictions):
-            stdout.write(f"Diagnosis accuracy Sankey Chart for {name}")
-            diagnosis_labels = [0, 1]
-            ax_l = sankey(left=y_t, right=pred, leftLabels=diagnosis_labels, rightLabels=diagnosis_labels)
-            ax_l.axis("on")
-            ax_r = ax_l.twinx()
-            for spine in ax_l.spines:
-                ax_l.spines[spine].set_visible(False)
-                ax_r.spines[spine].set_visible(False)
-            ax_l.set_xticks([])
-            ax_r.set_xticks([])
-            ax_l.set_yticks([])
-            ax_r.set_yticks([])
-            set_ax_labels(ax_l, title=f"{name} Sankey Plot", y="True Class")
-            set_ax_labels(ax_r, y="Predicted Class")
-            save_fig(ax_l.figure, os.path.join(output_dir, f"{stem}_Sankey-Prediction-Plot-{name.replace(' ', '-')}.png"))
+        # for name, pred in zip(names, predictions):
+        #     stdout.write(f"Diagnosis accuracy Sankey Chart for {name}")
+        #     diagnosis_labels = [0, 1]
+        #     ax_l = sankey(left=y_t, right=pred, leftLabels=diagnosis_labels, rightLabels=diagnosis_labels)
+        #     ax_l.axis("on")
+        #     ax_r = ax_l.twinx()
+        #     for spine in ax_l.spines:
+        #         ax_l.spines[spine].set_visible(False)
+        #         ax_r.spines[spine].set_visible(False)
+        #     ax_l.set_xticks([])
+        #     ax_r.set_xticks([])
+        #     ax_l.set_yticks([])
+        #     ax_r.set_yticks([])
+        #     set_ax_labels(ax_l, title=f"{name} Sankey Plot", y="True Class")
+        #     set_ax_labels(ax_r, y="Predicted Class")
+        #     save_fig(ax_l.figure, os.path.join(output_dir, f"{stem}_Sankey-Prediction-Plot-{name.replace(' ', '-')}.png"))
 
         # if use_rf and rf:
         #     stdout.write("Tree graph for Random Forest estimator")
