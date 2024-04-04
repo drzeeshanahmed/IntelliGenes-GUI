@@ -22,7 +22,7 @@ class FiltersWidget(QWidget):
             "Selector Metrics": [r".*All-Features\.csv", r".*Selected-Features\.csv", r".*Selected-CIGT-File\.csv"],
             "Confusion Matrices": [r".*Confusion-Heatmap.*\.png", r".*Confusion-Matrix.*\.csv"],
             "ROC Curves": [r".*ROC-Curve.*\.png"],
-            "Sankey Plots": [r".*Sankey-Prediction-Plot.*\.png", r".*Classifier-Predictions\.csv"],
+            # "Sankey Plots": [r".*Sankey-Prediction-Plot.*\.png", r".*Classifier-Predictions\.csv"],
             "SHAP Scores": [r".*SHAP-Plot.*\.png", r".*SHAP-Scores.*\.csv"],
         }
         self.widgets = {k: QCheckBox(k) for k in self.regex.keys()}
