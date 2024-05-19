@@ -20,7 +20,7 @@ class HelpPage(Page):
 
         label = QLabel(
             """
-To learn more about IntelliGenes Desktop, you can visit the GitHub page (https://github.com/drzeeshanahmed/intelligenes/tree/intelligenes-gui).
+To learn more about IntelliGenes Desktop, you can visit the GitHub page (https://github.com/drzeeshanahmed/IntelliGenes-GUI).
 
 
 Authors:
