@@ -1,4 +1,5 @@
 # Data Manipulation Libraries
+import sys
 import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
@@ -354,7 +355,7 @@ def classify_features(
     metrics.to_csv(metrics_path, index=False)
     stdout.write(f"Saved classifier metrics to {metrics_path}")
 
-    pred_df = pd.concat([pred_df, *predictions])
+    pred_df = pd.concat([pred_df, *predictions], axis=1)
     prediction_path = os.path.join(output_dir, f"{stem}_Classifier-Predictions.csv")
     pred_df.to_csv(prediction_path, index=False)
     stdout.write(f"Saved classifier predictions to {prediction_path}")
@@ -490,14 +491,14 @@ def classify_features(
         # may print invalid values if the value is 0 (since 0 is undefined on a log scale). can ignore
         fig = sns.catplot(data=melted_df, hue=y_label_col, y="Feature", x="Value", kind="box", aspect=2, log_scale=True)
         fig.figure.set_size_inches(7, 2 + num_selected_features * 0.5)
-        fig.legend.set_loc(loc='upper right')
+        fig.legend.set_loc(loc="upper right")
         set_fig_labels(fig.figure, title="Feature Distribution")
         save_fig(fig.figure, os.path.join(output_dir, f"{stem}_Feature-Value-Distribution-Box.png"))
 
         stdout.write("Strip plot for feature distributions")
         fig = sns.catplot(data=melted_df, hue=y_label_col, y="Feature", x="Value", kind="strip", aspect=2, log_scale=True)
         fig.figure.set_size_inches(7, 2 + num_selected_features * 0.5)
-        fig.legend.set_loc(loc='upper right')
+        fig.legend.set_loc(loc="upper right")
         set_fig_labels(fig.figure, title="Feature Distribution")
         save_fig(fig.figure, os.path.join(output_dir, f"{stem}_Feature-Value-Distribution-Strip.png"))
 
